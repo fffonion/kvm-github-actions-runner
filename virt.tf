@@ -21,14 +21,25 @@ resource "libvirt_domain" "test" {
     network_name = "default" # List networks with virsh net-list
   }
 
+  cloudinit = libvirt_cloudinit_disk.commoninit.id
+
   disk {
     volume_id = libvirt_volume.master.id
   }
 
+  # IMPORTANT: this is a known bug on cloud images, since they expect a console
+  # we need to pass it
+  # https://bugs.launchpad.net/cloud-images/+bug/1573095
   console {
-    type = "pty"
-    target_type = "serial"
+    type        = "pty"
     target_port = "0"
+    target_type = "serial"
+  }
+
+  console {
+    type        = "pty"
+    target_type = "virtio"
+    target_port = "1"
   }
 
   graphics {
