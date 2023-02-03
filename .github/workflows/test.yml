@@ -1,0 +1,19 @@
+name: Labeler
+on:
+  pull_request:
+  push:
+
+jobs:
+  label:
+
+    runs-on: self-hosted
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+    - name: Checkout Kong source code
+      uses: actions/checkout@v3
+    - uses: actions/labeler@v4
+      with:
+        repo-token: "${{ secrets.GITHUB_TOKEN }}"
