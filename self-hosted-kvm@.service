@@ -1,0 +1,16 @@
+[Unit]
+Description=Self hosted github actions runner in KVM
+After=network.target
+
+[Service]
+Type=simple
+User=root
+Restart=always
+RestartSec=5s
+ExecStart=/tmp/self-hosted-kvm/loop.sh
+Environment=NAME=%i
+EnvironmentFile=/tmp/self-hosted-kvm.env
+LimitNOFILE=1048576
+
+[Install]
+WantedBy=multi-user.target

@@ -11,6 +11,11 @@ jobs:
       contents: read
       pull-requests: write
 
+    strategy:
+      matrix:
+        a: [1,2,3,4]
+        b: [5,6,7,8]
+
     steps:
     - name: Checkout Kong source code
       uses: actions/checkout@v3
