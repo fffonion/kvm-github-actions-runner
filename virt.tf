@@ -9,6 +9,7 @@ resource "libvirt_volume" "master" {
   name           = "master.qcow2"
   base_volume_id = libvirt_volume.base_volume.id
   size           = 21474836480 # 20g
+
 }
 
 
@@ -48,4 +49,5 @@ resource "libvirt_domain" "test" {
     listen_type = "address"
     autoport    = true
   }
+
 }
