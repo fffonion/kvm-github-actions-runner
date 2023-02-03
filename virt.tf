@@ -44,8 +44,8 @@ resource "libvirt_domain" "test" {
   }
 
   graphics {
-    type = "spice"
+    type        = "spice"
     listen_type = "address"
-    autoport = true
+    autoport    = true
   }
 }
