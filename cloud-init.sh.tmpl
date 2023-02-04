@@ -6,6 +6,9 @@ if [[ $(whoami) == root ]]; then
 	exec sudo -H -u ubuntu bash $0
 fi
 
+echo "Making docker socket less secure"
+sudo chmod 777 /var/run/docker.sock
+
 echo "Start installing actions runner ${RUNNER_VER}"
 
 echo "User $USER, UID: $(id)"

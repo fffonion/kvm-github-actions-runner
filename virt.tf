@@ -1,12 +1,3 @@
-resource "libvirt_volume" "base_volume" {
-  count = 0
-  name  = "runner-ubuntu-22.04.qcow2"
-  # pool = "default" # List storage pools using virsh pool-list
-  # source = "https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64-disk-kvm.img"
-  source = "/home/wangchong/runner-images-kvm/images/linux/output-custom_image.old/ubuntu-22.04"
-  format = "qcow2"
-}
-
 resource "libvirt_volume" "master" {
   name = "${var.name}-master.qcow2"
   #base_volume_id = libvirt_volume.base_volume.id
@@ -18,7 +9,7 @@ resource "libvirt_volume" "master" {
 # Define KVM domain to create
 resource "libvirt_domain" "test" {
   name   = "${var.name}-runner"
-  memory = "2048"
+  memory = "4096"
   vcpu   = 2
 
   network_interface {
