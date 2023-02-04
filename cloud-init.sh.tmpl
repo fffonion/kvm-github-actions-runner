@@ -28,5 +28,7 @@ tar xzf ./actions-runner-linux-x64-${RUNNER_VER}.tar.gz
 
 ./run.sh
 
+./config.sh remove --token "${TOKEN}" || true
+
 sudo poweroff
 

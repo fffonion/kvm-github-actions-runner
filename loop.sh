@@ -63,10 +63,11 @@ terraform init -upgrade
 old_token=$reg_token
 while [[ $(date +%s) -lt $token_expire ]]; do
 	while [[ ! -z $(terraform state list) ]]; do
-		terraform plan -var repo=$repovar -var runner_version=2.301.1 -var token=$old_token -var name=$namevar -detailed-exitcode || (terraform taint libvirt_volume.master; break)
+		terraform plan -var repo=$repovar -var runner_version=2.301.1 -var token=$old_token -var name=$namevar -detailed-exitcode || break
 		sleep 5
 	done	
 
+	terraform taint libvirt_volume.master || true
 	terraform apply -auto-approve -var repo=$repovar -var runner_version=2.301.1 -var token=$reg_token -var name=$namevar
-	old_token=reg_token
+	old_token=$reg_token
  done
