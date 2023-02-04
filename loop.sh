@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -ex
 
 if [[ -z $GITHUB_TOKEN ]]; then
 	echo '$GITHUB_TOKEN is required'
@@ -43,16 +43,30 @@ fi
 namevar="$namevar$(echo $RANDOM | md5sum | head -c 8)"
 
 workdir=/tmp/self-hosted-kvm-tf-$NAME
+statedir=/tmp/self-hosted-kvm-tf-$NAME.state
+mkdir -p $statedir
+if [[ -e $workdir/terraform.tfstate ]]; then
+	cp $workdir/terraform.tfstate* $statedir
+fi
 rm -rf $workdir
 cp -r $(dirname $(readlink -f $0)) $workdir
 pushd $workdir
 
+rm terraform.tfstate* -f
+if [[ -e $statedir/terraform.tfstate ]]; then
+	cp $statedir/terraform.tfstate* $workdir
+fi
+
+terraform init -upgrade
+
+# avoid token change result in an re-apply; we only re-apply when instance exists/job finishes
+old_token=$reg_token
 while [[ $(date +%s) -lt $token_expire ]]; do
-	while true; do
-		terraform plan -var repo=$repovar -var runner_version=2.301.1 -var token=$reg_token -var name=$namevar -detailed-exitcode || break
+	while [[ ! -z $(terraform state list) ]]; do
+		terraform plan -var repo=$repovar -var runner_version=2.301.1 -var token=$old_token -var name=$namevar -detailed-exitcode || (terraform taint libvirt_volume.master; break)
 		sleep 5
 	done	
 
-	terraform taint libvirt_volume.master
 	terraform apply -auto-approve -var repo=$repovar -var runner_version=2.301.1 -var token=$reg_token -var name=$namevar
+	old_token=reg_token
  done

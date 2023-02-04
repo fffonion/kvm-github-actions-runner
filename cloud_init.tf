@@ -1,5 +1,5 @@
 resource "libvirt_cloudinit_disk" "commoninit" {
-  name      = "commoninit.iso"
+  name      = "${var.name}-commoninit.iso"
   user_data = data.cloudinit_config.main.rendered
 }
 
