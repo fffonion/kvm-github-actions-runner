@@ -11,7 +11,8 @@ data "cloudinit_config" "main" {
   part {
     filename     = "init.cfg"
     content_type = "text/cloud-config"
-    content      = templatefile("${path.module}/cloud-init.yml", {})
+    content = templatefile("${path.module}/cloud-init.yml",
+    { NAME = var.name })
   }
 
   part {

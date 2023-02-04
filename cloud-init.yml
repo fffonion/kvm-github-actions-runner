@@ -4,6 +4,9 @@ chpasswd:
   expire: False
 ssh_pwauth: True
 
+preserve_hostname: false
+hostname: runner-${NAME}
+
 growpart:
   mode: auto
   devices: ["/"]

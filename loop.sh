@@ -5,6 +5,11 @@ if [[ -z $GITHUB_TOKEN ]]; then
 	exit 1
 fi
 
+if [[ ! -z $namevar ]]; then
+	echo '$NAME isrequired'
+	exit 1
+fi
+
 if [[ ! -z $ORG ]]; then
 	url=https://api.github.com/orgs/${ORG}/actions/runners/registration-token
 elif [[ ! -z $REPO ]]; then
@@ -37,10 +42,6 @@ if [[ ! -z $REPO ]]; then
 	repovar=https://github.com/$REPO
 fi
 namevar="$NAME"
-if [[ ! -z $namevar ]]; then
-	namevar="$namevar-"
-fi
-namevar="$namevar$(echo $RANDOM | md5sum | head -c 8)"
 
 workdir=/tmp/self-hosted-kvm-tf-$NAME
 statedir=/tmp/self-hosted-kvm-tf-$NAME.state
@@ -58,6 +59,13 @@ if [[ -e $statedir/terraform.tfstate ]]; then
 fi
 
 terraform init -upgrade
+
+
+if [[ "$1" == "stop" ]]; then
+	echo "ExecStop"
+	terraform destroy -auto-approve -var repo=$repovar -var runner_version=2.301.1 -var token=$reg_token -var name=$namevar
+	exit 0
+fi
 
 # avoid token change result in an re-apply; we only re-apply when instance exists/job finishes
 old_token=$reg_token

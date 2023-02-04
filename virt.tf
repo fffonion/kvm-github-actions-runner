@@ -1,6 +1,6 @@
 resource "libvirt_volume" "base_volume" {
   count = 0
-  name = "runner-ubuntu-22.04.qcow2"
+  name  = "runner-ubuntu-22.04.qcow2"
   # pool = "default" # List storage pools using virsh pool-list
   # source = "https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64-disk-kvm.img"
   source = "/home/wangchong/runner-images-kvm/images/linux/output-custom_image.old/ubuntu-22.04"
@@ -11,7 +11,7 @@ resource "libvirt_volume" "master" {
   name = "${var.name}-master.qcow2"
   #base_volume_id = libvirt_volume.base_volume.id
   base_volume_name = "runner-ubuntu-22.04.qcow2"
-  size             = 107374182400 # 100g 
+  # size             = 85899345920 # 80G 
 }
 
 
@@ -52,4 +52,9 @@ resource "libvirt_domain" "test" {
     autoport    = true
   }
 
+
+  network_interface {
+    network_name   = "default"
+    hostname       = "${var.name}-runner"
+  }
 }
