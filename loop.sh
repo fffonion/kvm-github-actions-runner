@@ -46,8 +46,9 @@ repovar=""
 if [[ ! -z $REPO ]]; then
 	repovar=https://github.com/$REPO
 fi
-namevar="$NAME-$(hostname)"
+namevar="$(hostname)-$NAME"
 
+mkdir -p /root/vms
 workdir=/root/vms/self-hosted-kvm-tf-$NAME
 statedir=/root/vms/self-hosted-kvm-tf-$NAME.state
 mkdir -p $statedir

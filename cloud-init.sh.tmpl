@@ -14,6 +14,12 @@ if [[ ! -z "${DOCKER_USER}" && ! -z "${DOCKER_PASS}" ]]; then
 	echo "${DOCKER_PASS}" | docker login --username ${DOCKER_USER} --password-stdin
 fi
 
+echo "Update source"
+#sudo sysctl net.ipv6.conf.all.disable_ipv6=1
+sudo sed -i 's/azure\.archive\.ubuntu\.com\/ubuntu/mirror\.hetzner\.com\/ubuntu\/packages/' /etc/apt/sources.list
+sudo sed -i 's/archive\.ubuntu\.com\/ubuntu/mirror\.hetzner\.com\/ubuntu\/packages/' /etc/apt/sources.list
+sudo sed -i 's/security\.ubuntu\.com\/ubuntu/mirror\.hetzner\.com\/ubuntu\/packages/' /etc/apt/sources.list
+
 echo "Start installing actions runner ${RUNNER_VER}"
 
 echo "User $USER, UID: $(id)"
@@ -38,6 +44,11 @@ sudo chown $USER /work
 	--labels "${LABELS}" \
 	--url "${REPO}" \
 	--token "${TOKEN}"
+
+function finish {
+	./config.sh remove --token "${TOKEN}" || true
+}
+trap finish EXIT
 
 ./run.sh
 
