@@ -9,6 +9,11 @@ fi
 echo "Making docker socket less secure"
 sudo chmod 777 /var/run/docker.sock
 
+if [[ ! -z "${DOCKER_USER}" && ! -z "${DOCKER_PASS}" ]]; then
+	echo "Login docker"
+	echo "${DOCKER_PASS}" | docker login --username ${DOCKER_USER} --password-stdin
+fi
+
 echo "Start installing actions runner ${RUNNER_VER}"
 
 echo "User $USER, UID: $(id)"
@@ -21,11 +26,16 @@ curl -o actions-runner-linux-x64-${RUNNER_VER}.tar.gz -L https://github.com/acti
 
 tar xzf ./actions-runner-linux-x64-${RUNNER_VER}.tar.gz
 
+sudo mkdir /work
+sudo chown $USER /work
+
 ./config.sh \
 	--unattended \
 	--replace \
 	--ephemeral \
 	--name "${NAME}" \
+	--work /work \
+	--labels "${LABELS}" \
 	--url "${REPO}" \
 	--token "${TOKEN}"
 

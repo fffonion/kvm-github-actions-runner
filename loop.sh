@@ -5,8 +5,13 @@ if [[ -z $GITHUB_TOKEN ]]; then
 	exit 1
 fi
 
-if [[ ! -z $namevar ]]; then
-	echo '$NAME isrequired'
+if [[ -z $NAME ]]; then
+	echo '$NAME is required'
+	exit 1
+fi
+
+if [[ -z $RUNNER_VERSION ]]; then
+	echo '$RUNNER_VERSION is required'
 	exit 1
 fi
 
@@ -41,10 +46,10 @@ repovar=""
 if [[ ! -z $REPO ]]; then
 	repovar=https://github.com/$REPO
 fi
-namevar="$NAME"
+namevar="$NAME-$(hostname)"
 
-workdir=/tmp/self-hosted-kvm-tf-$NAME
-statedir=/tmp/self-hosted-kvm-tf-$NAME.state
+workdir=/root/vms/self-hosted-kvm-tf-$NAME
+statedir=/root/vms/self-hosted-kvm-tf-$NAME.state
 mkdir -p $statedir
 if [[ -e $workdir/terraform.tfstate ]]; then
 	cp $workdir/terraform.tfstate* $statedir
@@ -60,10 +65,11 @@ fi
 
 terraform init -upgrade
 
+tf_args="-var repo=$repovar -var runner_version=$RUNNER_VERSION -var docker_user=$DOCKER_USER -var docker_pass=$DOCKER_PASS -var name=$namevar -var labels=$LABELS"
 
 if [[ "$1" == "stop" ]]; then
 	echo "ExecStop"
-	terraform destroy -auto-approve -var repo=$repovar -var runner_version=2.301.1 -var token=$reg_token -var name=$namevar
+	terraform destroy -auto-approve $tf_args -var token=$reg_token
 	exit 0
 fi
 
@@ -71,11 +77,11 @@ fi
 old_token=$reg_token
 while [[ $(date +%s) -lt $token_expire ]]; do
 	while [[ ! -z $(terraform state list) ]]; do
-		terraform plan -var repo=$repovar -var runner_version=2.301.1 -var token=$old_token -var name=$namevar -detailed-exitcode || break
+		terraform plan $tf_args -var token=$old_token -detailed-exitcode || break
 		sleep 5
 	done	
 
 	terraform taint libvirt_volume.master || true
-	terraform apply -auto-approve -var repo=$repovar -var runner_version=2.301.1 -var token=$reg_token -var name=$namevar
+	terraform apply -auto-approve $tf_args -var token=$reg_token
 	old_token=$reg_token
  done

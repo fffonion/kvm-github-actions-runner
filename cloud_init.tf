@@ -20,10 +20,13 @@ data "cloudinit_config" "main" {
     content = templatefile(
       "${path.module}/cloud-init.sh.tmpl",
       {
-        REPO       = var.repo
-        TOKEN      = var.token
-        NAME       = var.name
-        RUNNER_VER = var.runner_version
+        REPO        = var.repo
+        TOKEN       = var.token
+        NAME        = var.name
+	LABELS      = var.labels
+        RUNNER_VER  = var.runner_version
+        DOCKER_USER = var.docker_user
+        DOCKER_PASS = var.docker_pass
       }
     )
   }

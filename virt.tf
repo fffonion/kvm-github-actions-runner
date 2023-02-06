@@ -45,7 +45,7 @@ resource "libvirt_domain" "test" {
 
 
   network_interface {
-    network_name   = "default"
-    hostname       = "${var.name}-runner"
+    network_name = "default"
+    hostname     = "${var.name}-runner"
   }
 }
