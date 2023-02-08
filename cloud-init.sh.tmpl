@@ -6,6 +6,13 @@ if [[ $(whoami) == root ]]; then
 	exec sudo -H -u ubuntu bash $0
 fi
 
+#echo "Creating swapfile"
+
+#sudo fallocate -l 2G /swapfile
+#sudo chmod 600 /swapfile
+#sudo mkswap /swapfile
+#sudo swapon /swapfile
+
 echo "Making docker socket less secure"
 sudo chmod 777 /var/run/docker.sock
 

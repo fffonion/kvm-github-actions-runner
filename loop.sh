@@ -15,33 +15,6 @@ if [[ -z $RUNNER_VERSION ]]; then
 	exit 1
 fi
 
-if [[ ! -z $ORG ]]; then
-	url=https://api.github.com/orgs/${ORG}/actions/runners/registration-token
-elif [[ ! -z $REPO ]]; then
-	url=https://api.github.com/repos/${REPO}/actions/runners/registration-token
-else
-	echo 'Neither $ORG nor $REPO is defined'
-	exit 1
-fi
-
-token_start=$(date +%s)
-token_expire=$((token_start + 3500))
-reg_token_ret=$(curl \
-  -s \
-  -X POST \
-  -H "Accept: application/vnd.github+json" \
-  -H "Authorization: Bearer $GITHUB_TOKEN"\
-  -H "X-GitHub-Api-Version: 2022-11-28" \
-  $url)
-
-reg_token=$(echo "$reg_token_ret" | jq -r .token)
-if [[ -z $reg_token || $reg_token == "null" ]]; then
-	echo "Unable to get registration token, error was $reg_token_ret"
-	exit 1
-fi
-
-echo "Reg token is obtained: $reg_token"
-
 repovar=""
 if [[ ! -z $REPO ]]; then
 	repovar=https://github.com/$REPO
@@ -55,8 +28,9 @@ mkdir -p $statedir
 if [[ -e $workdir/terraform.tfstate ]]; then
 	cp $workdir/terraform.tfstate* $statedir
 fi
-rm -rf $workdir
-cp -r $(dirname $(readlink -f $0)) $workdir
+rm -rf $workdir/*
+mkdir -p $workdir
+cp -r $(dirname $(readlink -f $0))/* $workdir/
 pushd $workdir
 
 rm terraform.tfstate* -f
@@ -72,17 +46,53 @@ if [[ "$1" == "stop" ]]; then
 	echo "ExecStop"
 	terraform destroy -auto-approve $tf_args -var token=$reg_token
 	exit 0
+elif [[ "$1" == "reload" ]]; then
+	exit 0
 fi
 
-# avoid token change result in an re-apply; we only re-apply when instance exists/job finishes
-old_token=$reg_token
-while [[ $(date +%s) -lt $token_expire ]]; do
-	while [[ ! -z $(terraform state list) ]]; do
-		terraform plan $tf_args -var token=$old_token -detailed-exitcode || break
-		sleep 5
-	done	
+if [[ ! -z $ORG ]]; then
+	url=https://api.github.com/orgs/${ORG}/actions/runners/registration-token
+elif [[ ! -z $REPO ]]; then
+	url=https://api.github.com/repos/${REPO}/actions/runners/registration-token
+else
+	echo 'Neither $ORG nor $REPO is defined'
+	exit 1
+fi
 
-	terraform taint libvirt_volume.master || true
-	terraform apply -auto-approve $tf_args -var token=$reg_token
-	old_token=$reg_token
- done
+# remove the -e flag, incase we hit a bug, we don't want to just kill the vm
+set +e
+
+while true; do
+	token_start=$(date +%s)
+	token_expire=$((token_start + 3500))
+	reg_token_ret=$(curl \
+	  -s \
+	  -X POST \
+	  -H "Accept: application/vnd.github+json" \
+	  -H "Authorization: Bearer $GITHUB_TOKEN"\
+	  -H "X-GitHub-Api-Version: 2022-11-28" \
+	  $url)
+
+	reg_token=$(echo "$reg_token_ret" | jq -r .token)
+	if [[ -z $reg_token || $reg_token == "null" ]]; then
+		echo "Unable to get registration token, error was $reg_token_ret"
+		exit 1
+	fi
+
+	echo "Reg token is obtained: $reg_token"
+
+	while [[ $(date +%s) -lt $token_expire ]]; do
+		while [[ ! -z $(terraform state list) ]]; do
+			plan=$(terraform plan $tf_args -var token=$reg_token -detailed-exitcode)
+			# we only re-apply when instance exists/job finishes
+			if [[ $? -ne 0 && ! $(echo "$plan"|grep running|grep -q false) ]]; then
+				break
+			fi
+			sleep 5
+		done
+
+		terraform taint libvirt_volume.master || true
+		terraform apply -auto-approve $tf_args -var token=$reg_token
+		old_token=$reg_token
+	done
+done

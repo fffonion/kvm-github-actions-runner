@@ -9,6 +9,7 @@ Restart=always
 RestartSec=5s
 ExecStart=/root/self-hosted-kvm/loop.sh
 ExecStop=/root/self-hosted-kvm/loop.sh stop
+ExecReload=/root/self-hosted-kvm/loop.sh reload
 Environment=NAME=%i
 EnvironmentFile=/root/self-hosted-kvm.env
 LimitNOFILE=1048576
