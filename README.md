@@ -24,6 +24,16 @@ mkdir -p $HOME/.local/share/libvirt/images
 sudo virsh pool-define-as --name default --type dir --target $HOME/.local/share/libvirt/images/
 sudo virsh pool-autostart default
 
+sudo virsh net-stop default
+sudo virsh net-edit default
+# add  <ip family='ipv6' address='</64-prefix>:1001::2' prefix='96'>
+    <dhcp>
+      <range start='</64-prefix>:1001::1001' end='</64-prefix>:1001::1fff'/>
+    </dhcp>
+  </ip>
+#
+sudo virsh net-start default
+
 sudo virsh net-autostart default
 
 sudo systemctl restart libvirtd
