@@ -9,7 +9,7 @@ resource "libvirt_volume" "master" {
 # Define KVM domain to create
 resource "libvirt_domain" "test" {
   name   = "${var.name}-runner"
-  memory = "4096"
+  memory = "7168"
   vcpu   = 2
 
   network_interface {

@@ -6,12 +6,13 @@ if [[ $(whoami) == root ]]; then
 	exec sudo -H -u ubuntu bash $0
 fi
 
-#echo "Creating swapfile"
+echo "Creating swapfile"
 
-#sudo fallocate -l 2G /swapfile
-#sudo chmod 600 /swapfile
-#sudo mkswap /swapfile
-#sudo swapon /swapfile
+sudo fallocate -l 2G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+sudo sysctl -w vm.swappiness=20
 
 echo "Making docker socket less secure"
 sudo chmod 777 /var/run/docker.sock
@@ -22,7 +23,7 @@ if [[ ! -z "${DOCKER_USER}" && ! -z "${DOCKER_PASS}" ]]; then
 fi
 
 echo "Update source"
-#sudo sysctl net.ipv6.conf.all.disable_ipv6=1
+sudo sysctl net.ipv6.conf.all.disable_ipv6=1
 sudo sed -i 's/azure\.archive\.ubuntu\.com\/ubuntu/mirror\.hetzner\.com\/ubuntu\/packages/' /etc/apt/sources.list
 sudo sed -i 's/archive\.ubuntu\.com\/ubuntu/mirror\.hetzner\.com\/ubuntu\/packages/' /etc/apt/sources.list
 sudo sed -i 's/security\.ubuntu\.com\/ubuntu/mirror\.hetzner\.com\/ubuntu\/packages/' /etc/apt/sources.list

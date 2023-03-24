@@ -83,8 +83,9 @@ while true; do
 
 	while [[ $(date +%s) -lt $token_expire ]]; do
 		while [[ ! -z $(terraform state list) ]]; do
-			plan=$(terraform plan $tf_args -var token=$reg_token -detailed-exitcode)
+			plan=$(timeout 10 terraform plan $tf_args -var token=$reg_token -detailed-exitcode)
 			# we only re-apply when instance exists/job finishes
+			# also ignore timeouts
 			if [[ $? -ne 0 && ! $(echo "$plan"|grep running|grep -q false) ]]; then
 				break
 			fi
