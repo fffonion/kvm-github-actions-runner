@@ -12,6 +12,10 @@ resource "libvirt_domain" "test" {
   memory = "7168"
   vcpu   = 2
 
+  cpu {
+    mode = "host-passthrough"
+  }
+
   network_interface {
     network_name = "default" # List networks with virsh net-list
   }
