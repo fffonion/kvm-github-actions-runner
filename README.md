@@ -62,6 +62,7 @@ cd /root/self-hosted-kvm
 
 # uplaod the base image into volume
 pushd base-volume
+terraform init
 terraform apply -auto-approve -var image_path=/path/to/runner-images-kvm/output-custom_image/ubuntu-22.04
 popd
 
