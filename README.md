@@ -35,6 +35,9 @@ sudo virsh net-start default
 
 sudo virsh net-autostart default
 
+# currently not sure about the right approach to make it work under apparmor
+echo 'security_driver ="none"' |sudo tee -a /etc/libvirt/qemu.conf
+
 sudo systemctl restart libvirtd
 
 TF_VER=1.4.2
