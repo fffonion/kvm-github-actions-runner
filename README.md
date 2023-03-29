@@ -6,7 +6,7 @@
 sudo apt install cpu-checker qemu-kvm \
 	libvirt-daemon-system libvirt-clients \
 	bridge-utils virtinst virt-manager \
-	unzip qemu-utils dnsmasq jq git
+	unzip qemu-utils dnsmasq mkisofs jq git
 sudo kvm-ok
 
 sudo modprobe vhost_net
