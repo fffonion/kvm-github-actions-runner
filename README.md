@@ -23,7 +23,7 @@ sudo usermod -aG libvirt $USER
 sudo virsh pool-define-as --name default --type dir --target /var/lib/libvirt/images/
 sudo virsh pool-autostart default
 
-sudo virsh net-stop default
+sudo virsh net-destroy default
 sudo virsh net-edit default
 # add  <ip family='ipv6' address='</64-prefix>:1001::2' prefix='96'>
     <dhcp>
@@ -51,7 +51,7 @@ packer build ./ubuntu-2204.pkr.hcl
 ## The repo
 
 ```shell
-git clone <THIS_REPO> /root/self-hosted-kvm
+git clone <THIS_REPO> /root/self-hosted-kvm -b kvm
 cd /root/self-hosted-kvm
 
 # uplaod the base image into volume
