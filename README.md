@@ -83,9 +83,28 @@ sudo systemctl daemon-reload
 
 sudo mkdir /root/vms
 
-sudo systemctl start self-hosted-kvm@runner-1
-sudo systemctl start self-hosted-kvm@runner-2
-sudo systemctl start self-hosted-kvm@runner-abaaba
+sudo systemctl start self-hosted-kvm@test1
+sudo systemctl start self-hosted-kvm@test2
+sudo systemctl start self-hosted-kvm@tiny1
 ```
 
 Each VM has 2 vCPU and 4G RAM.
+
+## Useful debugging commands
+
+```
+# show running VMs
+virsh -c qemu:///system list
+
+# show all VMs
+virsh -c qemu:///system list --all
+
+# destroy (stop the qemu process)
+virsh -c qemu:///system destroy $(hostname)-test1-runner
+
+# undefine (remove from libvirt)
+virsh -c qemu:///system undefine $(hostname)-test1-runner
+
+# display dhcp leases
+virsh -c qemu:///system net-dhcp-leases default
+```
