@@ -51,7 +51,7 @@ rm terraform_${TF_VER}_linux_amd64.zip
 ## The base image
 
 ```shell
-git clone https://github.com/fffonion/runner-images-kvm
+git clone https://github.com/fffonion/runner-images-kvm -b kvm
 cd runner-images-kvm/images/linux
 packer build ./ubuntu-2204.pkr.hcl
 # creates  output-custom_image/ubuntu-22.04
@@ -60,7 +60,7 @@ packer build ./ubuntu-2204.pkr.hcl
 ## The repo
 
 ```shell
-git clone <THIS_REPO> /root/self-hosted-kvm -b kvm
+git clone https://github.com/fffonion/kvm-github-actions-runner /root/self-hosted-kvm
 cd /root/self-hosted-kvm
 
 # uplaod the base image into volume
