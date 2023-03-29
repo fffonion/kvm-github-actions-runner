@@ -20,8 +20,7 @@ sudo systemctl enable libvirtd
 sudo usermod -aG libvirt $USER
 sudo usermod -aG libvirt $USER
 
-mkdir -p $HOME/.local/share/libvirt/images
-sudo virsh pool-define-as --name default --type dir --target $HOME/.local/share/libvirt/images/
+sudo virsh pool-define-as --name default --type dir --target /var/lib/libvirt/images/
 sudo virsh pool-autostart default
 
 sudo virsh net-stop default
