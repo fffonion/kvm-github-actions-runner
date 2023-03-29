@@ -105,6 +105,10 @@ virsh -c qemu:///system destroy $(hostname)-test1-runner
 # undefine (remove from libvirt)
 virsh -c qemu:///system undefine $(hostname)-test1-runner
 
+# use the serial console; username and password both `ubuntu`
+# might need to type Enter to show new shell prompt
+virsh -c qemu:///system console $(hostname)-test1-runner
+
 # display dhcp leases
 virsh -c qemu:///system net-dhcp-leases default
 ```
