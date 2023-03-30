@@ -84,10 +84,10 @@ sudo systemctl daemon-reload
 sudo mkdir /root/vms
 
 # start the managing process as well the VMs
-sudo systemctl start self-hosted-kvm@test{1,2,3,4,5,6,7,8}
+sudo systemctl start self-hosted-kvm@worker-{1,2,3,4,5,6,7,8}
 
 # enable start at boot
-sudo systemctl enable self-hosted-kvm@test{1,2,3,4,5,6,7,8}
+sudo systemctl enable self-hosted-kvm@worker-{1,2,3,4,5,6,7,8}
 ```
 
 Each VM has 2 vCPU and 4G RAM.
@@ -98,14 +98,14 @@ systemd:
 
 ```shell
 # restart all managing process (doesn't restart running VMs)
-sudo systemctl restart self-hosted-kvm@test*
+sudo systemctl restart self-hosted-kvm@worker-*
 
 # update terraform files (doesn't restart running VMs, affective on next boot)
 # use conjunction of reload then restart to actually update VMs
-sudo systemctl reload self-hosted-kvm@test*
+sudo systemctl reload self-hosted-kvm@worker-*
 
 # stop all managing process as well VMs
-sudo systemctl stop self-hosted-kvm@test*
+sudo systemctl stop self-hosted-kvm@worker-*
 ```
 
 virsh:
@@ -118,14 +118,14 @@ virsh -c qemu:///system list
 virsh -c qemu:///system list --all
 
 # destroy (stop the qemu process)
-virsh -c qemu:///system destroy $(hostname)-test1-runner
+virsh -c qemu:///system destroy $(hostname)-worker-1-runner
 
 # undefine (remove from libvirt)
-virsh -c qemu:///system undefine $(hostname)-test1-runner
+virsh -c qemu:///system undefine $(hostname)-worker-1-runner
 
 # use the serial console; username and password both `ubuntu`
 # might need to type Enter to show new shell prompt
-virsh -c qemu:///system console $(hostname)-test1-runner
+virsh -c qemu:///system console $(hostname)-worker-1-runner
 
 # display dhcp leases
 virsh -c qemu:///system net-dhcp-leases default
