@@ -101,6 +101,7 @@ systemd:
 sudo systemctl restart self-hosted-kvm@test*
 
 # update terraform files (doesn't restart running VMs, affective on next boot)
+# use conjunction of reload then restart to actually update VMs
 sudo systemctl reload self-hosted-kvm@test*
 
 # stop all managing process as well VMs
