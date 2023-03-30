@@ -6,6 +6,7 @@ ssh_pwauth: True
 
 preserve_hostname: false
 hostname: runner-${NAME}
+fqdn: runner-${NAME}.ci.konghq.com.internal
 
 growpart:
   mode: auto
