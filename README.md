@@ -75,7 +75,7 @@ REPO=<owner/repo; leave empty for org>
 LABELS=kvm,awesome-runner
 RUNNER_VERSION=2.301.1
 DOCKER_USER=<docker user that access to public registry, to increase pull rate limit only>
-DOCKER_PASSWORD=<the password>
+DOCKER_PASS=<the password>
 EOF
 
 sudo cp self-hosted-kvm@.service /etc/systemd/system/self-hosted-kvm@.service
@@ -83,16 +83,33 @@ sudo systemctl daemon-reload
 
 sudo mkdir /root/vms
 
-sudo systemctl start self-hosted-kvm@test1
-sudo systemctl start self-hosted-kvm@test2
-sudo systemctl start self-hosted-kvm@tiny1
+# start the managing process as well the VMs
+sudo systemctl start self-hosted-kvm@test{1,2,3,4,5,6,7,8}
+
+# enable start at boot
+sudo systemctl enable self-hosted-kvm@test{1,2,3,4,5,6,7,8}
 ```
 
 Each VM has 2 vCPU and 4G RAM.
 
 ## Useful debugging commands
 
+systemd:
+
+```shell
+# restart all managing process (doesn't restart running VMs)
+sudo systemctl restart self-hosted-kvm@test*
+
+# update terraform files (doesn't restart running VMs, affective on next boot)
+sudo systemctl reload self-hosted-kvm@test*
+
+# stop all managing process as well VMs
+sudo systemctl stop self-hosted-kvm@test*
 ```
+
+virsh:
+
+```shell
 # show running VMs
 virsh -c qemu:///system list
 
