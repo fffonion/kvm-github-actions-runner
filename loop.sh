@@ -1,7 +1,11 @@
 #!/bin/bash -ex
 
-if [[ -z $GITHUB_TOKEN ]]; then
-	echo '$GITHUB_TOKEN is required'
+if [[ -n $REG_TOKEN_LAMBDA_URL && -n $REG_TOKEN_LAMBDA_APIKEY ]]; then
+	echo "Using lambda to get reg token"
+elif [[ -n $GITHUB_TOKEN ]]; then
+	echo "Using PAT to get reg token"
+else
+	echo '$GITHUB_TOKEN, or $REG_TOKEN_LAMBDA_URL and $REG_TOKEN_LAMBDA_APIKEY is required'
 	exit 1
 fi
 
@@ -64,22 +68,42 @@ set +e
 
 while true; do
 	token_start=$(date +%s)
-	token_expire=$((token_start + 3500))
-	reg_token_ret=$(curl \
-	  -s \
-	  -X POST \
-	  -H "Accept: application/vnd.github+json" \
-	  -H "Authorization: Bearer $GITHUB_TOKEN"\
-	  -H "X-GitHub-Api-Version: 2022-11-28" \
-	  $url)
+	token_expire=$((token_start + 1700))
+	token_method=""
+	if [[ -n "$REG_TOKEN_LAMBDA_URL" && -n "$REG_TOKEN_LAMBDA_APIKEY" ]]; then
+		reg_token_ret=$(curl \
+		  -s \
+		  $REG_TOKEN_LAMBDA_URL \
+		  -H "apikey: $REG_TOKEN_LAMBDA_APIKEY"
+		)
 
-	reg_token=$(echo "$reg_token_ret" | jq -r .token)
-	if [[ -z $reg_token || $reg_token == "null" ]]; then
-		echo "Unable to get registration token, error was $reg_token_ret"
+		reg_token=$(echo "$reg_token_ret" | jq -r .join_token)
+		token_method="lambda"
+
+	elif [[ -n "$GITHUB_TOKEN" ]]; then
+		reg_token_ret=$(curl \
+		  -s \
+		  -X POST \
+		  -H "Accept: application/vnd.github+json" \
+		  -H "Authorization: Bearer $GITHUB_TOKEN"\
+		  -H "X-GitHub-Api-Version: 2022-11-28" \
+		  $url)
+
+		reg_token=$(echo "$reg_token_ret" | jq -r .token)
+		token_method="PAT"
+
+	else
+		echo "Unable to use either lambda or PAT to get token?"
 		exit 1
 	fi
 
-	echo "Reg token is obtained: $reg_token"
+
+	if [[ -z $reg_token || $reg_token == "null" ]]; then
+		echo "Unable to get registration token using $token_method, error was $reg_token_ret"
+		exit 1
+	fi
+
+	echo "Reg token is obtained using $token_method: $reg_token"
 
 	while [[ $(date +%s) -lt $token_expire ]]; do
 		while [[ ! -z $(terraform state list) ]]; do
