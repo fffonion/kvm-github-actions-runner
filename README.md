@@ -53,7 +53,7 @@ rm terraform_${TF_VER}_linux_amd64.zip
 ```shell
 git clone https://github.com/fffonion/runner-images-kvm -b kvm
 cd runner-images-kvm/images/linux
-packer build ./ubuntu-2204.pkr.hcl
+packer build ./ubuntu2204.pkr.hcl
 # creates  output-custom_image/ubuntu-22.04
 ``` 
 
