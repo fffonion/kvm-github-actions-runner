@@ -29,7 +29,7 @@ mv output-custom_image/ubuntu-22.04 /root/ubuntu-22.04
 git clone https://github.com/fffonion/kvm-github-actions-runner /root/self-hosted-kvm
 cd /root/self-hosted-kvm
 
-./ops/provision-new-host.sh
+./provision/setup-new-host.sh
 
 cat << EOF > /root/self-hosted-kvm.env
 GITHUB_TOKEN=<token with repo scope for repo runner, or admin:org for org runner>

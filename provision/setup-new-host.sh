@@ -25,7 +25,8 @@ sudo usermod -aG libvirt $USER
 sudo usermod -aG libvirt $USER
 
 ###### terraform ######
-ipv6_prefix=$(ifconfig enp41s0|grep inet6|head -n1|awk '{print $2}'|cut -d: -f1-4)
+ens=$(ip -o -4 route show to default|awk '{print $5}')
+ipv6_prefix=$(ifconfig $ens|grep inet6|grep -v fe80::|awk '{print $2}'|cut -d: -f1-4)
 if test -z "$ipv6_prefix"; then
     echo "No IPv6 prefix found?"
     exit 1
