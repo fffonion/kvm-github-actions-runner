@@ -1,2 +1,0 @@
-variable "image_path" {
-}
