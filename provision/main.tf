@@ -14,15 +14,16 @@ resource "libvirt_volume" "base_volume" {
   name   = "runner-ubuntu-22.04.qcow2"
   source = var.image_path
   format = "qcow2"
+  pool   = libvirt_pool.kong.name
 }
 
-resource "libvirt_pool" "default" {
+resource "libvirt_pool" "kong" {
   name = "kong"
   type = "dir"
   path = "/var/lib/libvirt/images/"
 }
 
-resource "libvirt_network" "default" {
+resource "libvirt_network" "kong" {
   name   = "kong"
   mode   = "nat"
   domain = "ci.konghq.com.internal"
