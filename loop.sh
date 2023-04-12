@@ -130,6 +130,8 @@ while true; do
 		terraform taint libvirt_volume.master || true
 		terraform apply -auto-approve $tf_args -var token=$reg_token
 		old_token=$reg_token
+
+		sleep 5
 	done
 done
 

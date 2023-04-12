@@ -1,6 +1,8 @@
 resource "libvirt_cloudinit_disk" "commoninit" {
   name      = "${var.name}-commoninit.iso"
   user_data = data.cloudinit_config.main.rendered
+
+  pool = "kong"
 }
 
 
