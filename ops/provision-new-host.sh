@@ -2,10 +2,8 @@
 
 set -o pipefail
 
-REPO_PATH=/root/self-hosted-kvm
+REPO_PATH=$(dirname $(realpath $0))/../
 IMAGE_PATH=/root/ubuntu-22.04
-
-git clone https://github.com/fffonion/kvm-github-actions-runner $REPO_PATH
 
 ###### packages ######
 sudo apt install -y cpu-checker qemu-kvm \
@@ -13,6 +11,8 @@ sudo apt install -y cpu-checker qemu-kvm \
 	bridge-utils virtinst virt-manager \
 	unzip qemu-utils dnsmasq mkisofs jq git
 sudo kvm-ok
+sudo systemctl stop dnsmasq
+sudo systemctl disable dnsmasq
 
 sudo modprobe vhost_net
 lsmod | grep vhost
@@ -38,6 +38,8 @@ mv terraform /usr/local/bin/terraform
 rm terraform_${TF_VER}_linux_amd64.zip
 
 pushd $REPO_PATH/provision
+
+sudo rm -rf /var/lib/libvirt/images/*
 
 terraform init
 terraform apply -auto-approve -var image_path=${IMAGE_PATH} -var ipv6_prefix=${ipv6_prefix}

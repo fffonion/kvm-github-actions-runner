@@ -23,7 +23,7 @@ data "cloudinit_config" "main" {
         REPO        = var.repo
         TOKEN       = var.token
         NAME        = var.name
-	LABELS      = var.labels
+        LABELS      = var.labels
         RUNNER_VER  = var.runner_version
         DOCKER_USER = var.docker_user
         DOCKER_PASS = var.docker_pass

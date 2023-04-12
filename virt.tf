@@ -2,7 +2,8 @@ resource "libvirt_volume" "master" {
   name = "${var.name}-master.qcow2"
   #base_volume_id = libvirt_volume.base_volume.id
   base_volume_name = "runner-ubuntu-22.04.qcow2"
-  # size             = 85899345920 # 80G 
+  # size             = 85899345920 # 80G
+  pool = "kong"
 }
 
 
@@ -14,10 +15,6 @@ resource "libvirt_domain" "test" {
 
   cpu {
     mode = "host-passthrough"
-  }
-
-  network_interface {
-    network_name = "default" # List networks with virsh net-list
   }
 
   cloudinit = libvirt_cloudinit_disk.commoninit.id
@@ -49,7 +46,7 @@ resource "libvirt_domain" "test" {
 
 
   network_interface {
-    network_name = "default"
+    network_name = "kong" # List networks with virsh net-list
     hostname     = "${var.name}-runner"
   }
 }
