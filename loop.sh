@@ -1,21 +1,25 @@
-#!/bin/bash -ex
+#!/bin/bash -e
+
+function echoerr() {
+    printf '%s %s\n' "ERROR" "$@" 1>&2;
+}
 
 if [[ -n $REG_TOKEN_LAMBDA_URL && -n $REG_TOKEN_LAMBDA_APIKEY ]]; then
-	echo "Using lambda to get reg token"
+	echoerr "Using lambda to get reg token"
 elif [[ -n $GITHUB_TOKEN ]]; then
 	echo "Using PAT to get reg token"
 else
-	echo '$GITHUB_TOKEN, or $REG_TOKEN_LAMBDA_URL and $REG_TOKEN_LAMBDA_APIKEY is required'
+	echoerr '$GITHUB_TOKEN, or $REG_TOKEN_LAMBDA_URL and $REG_TOKEN_LAMBDA_APIKEY is required'
 	exit 1
 fi
 
 if [[ -z $NAME ]]; then
-	echo '$NAME is required'
+	echoerr '$NAME is required'
 	exit 1
 fi
 
 if [[ -z $RUNNER_VERSION ]]; then
-	echo '$RUNNER_VERSION is required'
+	echoerr '$RUNNER_VERSION is required'
 	exit 1
 fi
 
@@ -47,10 +51,16 @@ terraform init -upgrade
 tf_args="-var repo=$repovar -var runner_version=$RUNNER_VERSION -var docker_user=$DOCKER_USER -var docker_pass=$DOCKER_PASS -var name=$namevar -var labels=$LABELS"
 
 if [[ "$1" == "stop" ]]; then
-	echo "ExecStop"
+	echo "Stopping the VM..."
 	terraform destroy -auto-approve $tf_args -var token=$reg_token
 	exit 0
 elif [[ "$1" == "reload" ]]; then
+	exit 0
+fi
+
+if [[ -e /tmp/self-hosted-kvm-draining ]]; then
+	echo "Draining, not starting new VMs"
+	sleep 30
 	exit 0
 fi
 
@@ -59,11 +69,11 @@ if [[ ! -z $ORG ]]; then
 elif [[ ! -z $REPO ]]; then
 	url=https://api.github.com/repos/${REPO}/actions/runners/registration-token
 else
-	echo 'Neither $ORG nor $REPO is defined'
+	echoerr 'Neither $ORG nor $REPO is defined'
 	exit 1
 fi
 
-# remove the -e flag, incase we hit a bug, we don't want to just kill the vm
+# remove the -e flag, in case we hit a bug, we don't want to just kill the vm
 set +e
 
 while true; do
@@ -93,13 +103,13 @@ while true; do
 		token_method="PAT"
 
 	else
-		echo "Unable to use either lambda or PAT to get token?"
+		echoerr "Unable to use either lambda or PAT to get token?"
 		exit 1
 	fi
 
 
 	if [[ -z $reg_token || $reg_token == "null" ]]; then
-		echo "Unable to get registration token using $token_method, error was $reg_token_ret"
+		echoerr "Unable to get registration token using $token_method, error was $reg_token_ret"
 		exit 1
 	fi
 
@@ -116,8 +126,11 @@ while true; do
 			sleep 5
 		done
 
+		echo "Reprovisioning the VM..."
 		terraform taint libvirt_volume.master || true
 		terraform apply -auto-approve $tf_args -var token=$reg_token
 		old_token=$reg_token
 	done
 done
+
+echoerr "Should not reach here"
