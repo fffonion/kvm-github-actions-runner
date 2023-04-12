@@ -1,73 +1,35 @@
 # Readme
 
-## Install
+## Prepare the base image
+
+### Option 1: Download from other machine
+
+TODO: use scp to copy from other existing machines for now
+
+### Option2: Build on current machine
 
 ```shell
-sudo apt install cpu-checker qemu-kvm \
-	libvirt-daemon-system libvirt-clients \
-	bridge-utils virtinst virt-manager \
-	unzip qemu-utils dnsmasq mkisofs jq git
-sudo kvm-ok
+PACKER_VER=1.8.6
+wget https://releases.hashicorp.com/packer/${PACKER_VER}/packer_${PACKER_VER}_linux_amd64.zip
+unzip packer_${PACKER_VER}_linux_amd64.zip
+mv packer /usr/local/bin/packer
+rm packer_${PACKER_VER}_linux_amd64.zip
 
-sudo modprobe vhost_net
-lsmod | grep vhost
-echo vhost_net | sudo tee -a /etc/modules
-
-sudo systemctl start libvirtd
-sudo systemctl enable libvirtd
-
-
-sudo usermod -aG libvirt $USER
-sudo usermod -aG libvirt $USER
-
-sudo virsh pool-define-as --name default --type dir --target /var/lib/libvirt/images/
-sudo virsh pool-autostart default
-
-sudo virsh net-destroy default
-sudo virsh net-edit default
-# add  <ip family='ipv6' address='</64-prefix>:1001::2' prefix='96'>
-    <dhcp>
-      <range start='</64-prefix>:1001::1001' end='</64-prefix>:1001::1fff'/>
-    </dhcp>
-  </ip>
-#
-sudo virsh net-start default
-
-sudo virsh net-autostart default
-
-# currently not sure about the right approach to make it work under apparmor
-echo 'security_driver ="none"' |sudo tee -a /etc/libvirt/qemu.conf
-
-sudo systemctl restart libvirtd
-
-TF_VER=1.4.2
-wget https://releases.hashicorp.com/terraform/${TF_VER}/terraform_${TF_VER}_linux_amd64.zip
-unzip terraform_${TF_VER}_linux_amd64.zip
-mv terraform /usr/local/bin/terraform
-rm terraform_${TF_VER}_linux_amd64.zip
-
-``` 
-
-## The base image
-
-```shell
-git clone https://github.com/fffonion/runner-images-kvm -b kvm
-cd runner-images-kvm/images/linux
+sudo apt install git -y
+git clone https://github.com/fffonion/runner-images-kvm -b kvm /root/runner-images-kvm
+cd /root/runner-images-kvm/images/linux
 packer build ./ubuntu2204.pkr.hcl
+mv output-custom_image/ubuntu-22.04 /root/ubuntu-22.04
 # creates  output-custom_image/ubuntu-22.04
 ``` 
 
-## The repo
+## Provision
 
 ```shell
 git clone https://github.com/fffonion/kvm-github-actions-runner /root/self-hosted-kvm
 cd /root/self-hosted-kvm
 
-# uplaod the base image into volume
-pushd base-volume
-terraform init
-terraform apply -auto-approve -var image_path=/path/to/runner-images-kvm/output-custom_image/ubuntu-22.04
-popd
+./ops/provision-new-host.sh
 
 cat << EOF > /root/self-hosted-kvm.env
 GITHUB_TOKEN=<token with repo scope for repo runner, or admin:org for org runner>
@@ -78,11 +40,6 @@ DOCKER_USER=<docker user that access to public registry, to increase pull rate l
 DOCKER_PASS=<the password>
 EOF
 
-sudo cp self-hosted-kvm@.service /etc/systemd/system/self-hosted-kvm@.service
-sudo systemctl daemon-reload
-
-sudo mkdir /root/vms
-
 # start the managing process as well the VMs
 sudo systemctl start self-hosted-kvm@worker-{1,2,3,4,5,6,7,8}
 
@@ -91,6 +48,18 @@ sudo systemctl enable self-hosted-kvm@worker-{1,2,3,4,5,6,7,8}
 ```
 
 Each VM has 2 vCPU and 4G RAM.
+
+## Drain a node
+
+```shell
+touch /tmp/self-hosted-kvm-draining
+```
+
+After maintainance is finished:
+
+```shell
+rm /tmp/self-hosted-kvm-draining
+```
 
 ## Useful debugging commands
 
@@ -128,5 +97,5 @@ virsh -c qemu:///system undefine $(hostname)-worker-1-runner
 virsh -c qemu:///system console $(hostname)-worker-1-runner
 
 # display dhcp leases
-virsh -c qemu:///system net-dhcp-leases default
+virsh -c qemu:///system net-dhcp-leases kong
 ```
