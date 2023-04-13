@@ -26,6 +26,7 @@ data "cloudinit_config" "main" {
         TOKEN       = var.token
         NAME        = var.name
         LABELS      = var.labels
+        RUNNERGROUP = var.runnergroup
         RUNNER_VER  = var.runner_version
         DOCKER_USER = var.docker_user
         DOCKER_PASS = var.docker_pass

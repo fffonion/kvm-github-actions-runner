@@ -7,6 +7,12 @@ variable "labels" {
   type    = string
   default = ""
 }
+
+variable "runnergroup" {
+  type    = string
+  default = ""
+}
+
 variable "repo" {
   type    = string
   default = ""

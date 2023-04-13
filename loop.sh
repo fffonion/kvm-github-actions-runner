@@ -48,7 +48,7 @@ fi
 
 terraform init -upgrade
 
-tf_args="-var repo=$repovar -var runner_version=$RUNNER_VERSION -var docker_user=$DOCKER_USER -var docker_pass=$DOCKER_PASS -var name=$namevar -var labels=$LABELS"
+tf_args="-var repo=$repovar -var runner_version=$RUNNER_VERSION -var docker_user=$DOCKER_USER -var docker_pass=$DOCKER_PASS -var name=$namevar -var labels=$LABELS" -var runnergroup="$RUNNERGROUP"
 
 if [[ "$1" == "stop" ]]; then
 	echo "Stopping the VM..."
