@@ -60,6 +60,9 @@ tar xzf ./actions-runner-linux-x64-${RUNNER_VER}.tar.gz
 sudo mkdir /work
 sudo chown $USER /work
 
+cloud_image_serial=$(cat /etc/cloud/build.info |grep serial|awk '{print $2}')
+cat /imagegeneration/imagedata.json|jq  ".[1].detail |=  .+ \"\nCloud Image Serial: $cloud_image_serial\"" > .setup_info
+
 ./config.sh \
 	--unattended \
 	--replace \
