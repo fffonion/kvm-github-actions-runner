@@ -4,6 +4,15 @@ function echoerr() {
     printf '%s %s\n' "ERROR" "$@" 1>&2;
 }
 
+function checkdrain() {
+	if [[ -e /tmp/self-hosted-kvm-draining ]]; then
+		echo "Draining, not starting new VMs"
+		sleep 30
+		exit 0
+	fi
+}
+
+
 if [[ -n $REG_TOKEN_LAMBDA_URL && -n $REG_TOKEN_LAMBDA_APIKEY ]]; then
 	echo "Using lambda to get reg token"
 elif [[ -n $GITHUB_TOKEN ]]; then
@@ -64,11 +73,7 @@ if [[ "$1" == "reload" ]]; then
 	exit 0
 fi
 
-if [[ -e /tmp/self-hosted-kvm-draining ]]; then
-	echo "Draining, not starting new VMs"
-	sleep 30
-	exit 0
-fi
+checkdrain
 
 if [[ ! -z $ORG ]]; then
 	url=https://api.github.com/orgs/${ORG}/actions/runners/registration-token
@@ -145,6 +150,8 @@ while true; do
                 if [[ $token_method == "lambda" ]]; then
                    break
                 fi
+
+		checkdrain
 	done
 done
 
