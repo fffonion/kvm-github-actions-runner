@@ -22,7 +22,7 @@ data "cloudinit_config" "main" {
     content = templatefile(
       "${path.module}/cloud-init.sh.tmpl",
       {
-        REPO        = var.repo
+        URL         = var.url
         TOKEN       = var.token
         NAME        = var.name
         LABELS      = var.labels

@@ -34,6 +34,7 @@ cd /root/self-hosted-kvm
 cat << EOF > /root/self-hosted-kvm.env
 GITHUB_TOKEN=<token with repo scope for repo runner, or admin:org for org runner>
 REPO=<owner/repo; leave empty for org>
+ORG=<owner; leave empty for repo>
 LABELS=ubuntu-22.04-kong,ubuntu-latest-kong
 RUNNERGROUP=awesome group
 RUNNER_VERSION=2.303.0

@@ -5,7 +5,7 @@ function echoerr() {
 }
 
 if [[ -n $REG_TOKEN_LAMBDA_URL && -n $REG_TOKEN_LAMBDA_APIKEY ]]; then
-	echoerr "Using lambda to get reg token"
+	echo "Using lambda to get reg token"
 elif [[ -n $GITHUB_TOKEN ]]; then
 	echo "Using PAT to get reg token"
 else
@@ -23,9 +23,11 @@ if [[ -z $RUNNER_VERSION ]]; then
 	exit 1
 fi
 
-repovar=""
+urlvar=""
 if [[ ! -z $REPO ]]; then
-	repovar=https://github.com/$REPO
+	urlvar=https://github.com/$REPO
+else
+	urlvar=https://github.com/$ORG
 fi
 namevar="$(hostname)-$NAME"
 
@@ -36,6 +38,14 @@ mkdir -p $statedir
 if [[ -e $workdir/terraform.tfstate ]]; then
 	cp $workdir/terraform.tfstate* $statedir
 fi
+
+if [[ "$1" == "stop" ]]; then
+	pushd $workdir
+	echo "Stopping the VM..."
+	terraform destroy -auto-approve $tf_args -var token=$reg_token
+	exit 0
+fi
+
 rm -rf $workdir/*
 mkdir -p $workdir
 cp -r $(dirname $(readlink -f $0))/* $workdir/
@@ -48,13 +58,9 @@ fi
 
 terraform init -upgrade
 
-tf_args="-var repo=$repovar -var runner_version=$RUNNER_VERSION -var docker_user=$DOCKER_USER -var docker_pass=$DOCKER_PASS -var name=$namevar -var labels=$LABELS" -var runnergroup="$RUNNERGROUP"
+tf_args="-var url=$urlvar -var runner_version=$RUNNER_VERSION -var docker_user=$DOCKER_USER -var docker_pass=$DOCKER_PASS -var name=$namevar -var labels=$LABELS -var runnergroup=$RUNNERGROUP"
 
-if [[ "$1" == "stop" ]]; then
-	echo "Stopping the VM..."
-	terraform destroy -auto-approve $tf_args -var token=$reg_token
-	exit 0
-elif [[ "$1" == "reload" ]]; then
+if [[ "$1" == "reload" ]]; then
 	exit 0
 fi
 
@@ -128,7 +134,9 @@ while true; do
 
 		echo "Reprovisioning the VM..."
 		terraform taint libvirt_volume.master || true
+		set -x
 		terraform apply -auto-approve $tf_args -var token=$reg_token
+		set +x
 		old_token=$reg_token
 
 		sleep 5
