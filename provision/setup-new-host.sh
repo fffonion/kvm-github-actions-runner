@@ -24,12 +24,6 @@ sudo usermod -aG libvirt $USER
 sudo usermod -aG libvirt $USER
 
 ###### terraform ######
-ens=$(ip -o -4 route show to default|awk '{print $5}')
-ipv6_prefix=$(ifconfig $ens|grep inet6|grep -v fe80::|awk '{print $2}'|cut -d: -f1-4)
-if test -z "$ipv6_prefix"; then
-    echo "No IPv6 prefix found?"
-    exit 1
-fi
 
 TF_VER=1.4.2
 wget https://releases.hashicorp.com/terraform/${TF_VER}/terraform_${TF_VER}_linux_amd64.zip
@@ -37,14 +31,9 @@ unzip terraform_${TF_VER}_linux_amd64.zip
 mv terraform /usr/local/bin/terraform
 rm terraform_${TF_VER}_linux_amd64.zip
 
-pushd $REPO_PATH/provision
-
 sudo rm -rf /var/lib/libvirt/images/*
 
-terraform init
-terraform apply -auto-approve -var ipv6_prefix=${ipv6_prefix}
-
-popd
+$REPO_PATH/provision/apply-changes.sh
 
 # currently not sure about the right approach to make it work under apparmor
 echo 'security_driver ="none"' |sudo tee -a /etc/libvirt/qemu.conf
