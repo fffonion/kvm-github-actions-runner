@@ -21,7 +21,7 @@ cd /root/runner-images-kvm/images/linux
 packer build ./ubuntu2204.pkr.hcl
 # A docker user with any public repository pull access is preferred to overcome ratelimit.
 # packer build -var dockerhub_login=<user> -var dockerhub_password=<pwd> -var image_version=$(git describe --tags --always|cut -d/ -f2) ./ubuntu2204.pkr.hcl
-mv output-custom_image/ubuntu-22.04 /root/ubuntu-22.04
+mv output-custom_image/ubuntu-22.04 /root/ubuntu-22.04-$(git describe --tags --always|cut -d/ -f2)
 # creates  output-custom_image/ubuntu-22.04
 ``` 
 

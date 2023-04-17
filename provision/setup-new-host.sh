@@ -3,7 +3,6 @@
 set -o pipefail
 
 REPO_PATH=$(dirname $(realpath $0))/../
-IMAGE_PATH=/root/ubuntu-22.04
 
 ###### packages ######
 sudo apt install -y cpu-checker qemu-kvm \
@@ -43,7 +42,7 @@ pushd $REPO_PATH/provision
 sudo rm -rf /var/lib/libvirt/images/*
 
 terraform init
-terraform apply -auto-approve -var image_path=${IMAGE_PATH} -var ipv6_prefix=${ipv6_prefix}
+terraform apply -auto-approve -var ipv6_prefix=${ipv6_prefix}
 
 popd
 
