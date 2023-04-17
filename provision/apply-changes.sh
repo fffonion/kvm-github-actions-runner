@@ -7,9 +7,5 @@ if test -z "$ipv6_prefix"; then
     exit 1
 fi
 
-pushd $REPO_PATH/provision
-
 terraform init
 terraform apply -var ipv6_prefix=${ipv6_prefix}
-
-popd
