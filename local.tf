@@ -1,3 +1,3 @@
 locals {
-  image_version = "20230409.1"
+  image_version = "20230409.2"
 }
