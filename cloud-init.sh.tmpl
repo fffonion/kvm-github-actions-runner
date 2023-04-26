@@ -8,7 +8,7 @@ fi
 
 function send_metrics() {
 	dogstatsd_tags="#worker:${NAME},#group:${RUNNERGROUP}"
-	echo -n "self_hosted_runner.$1:${2:-1}|${3:-c}|$dogstatsd_tags" > /dev/udp/10.1.0.1/8125
+	echo -n "self_hosted_runner.$1:$${2:-1}}|$${3:-c}|$dogstatsd_tags" > /dev/udp/10.1.0.1/8125
 }
 
 send_metrics vms_started
