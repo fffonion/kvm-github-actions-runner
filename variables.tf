@@ -14,8 +14,8 @@ variable "runnergroup" {
 }
 
 variable "url" {
-  type    = string
-  default = "url to register the runner with, like https://github.com/owner/repo or https://github.com/org"
+  type        = string
+  description = "url to register the runner with, like https://github.com/owner/repo or https://github.com/org"
 }
 
 variable "token" {
