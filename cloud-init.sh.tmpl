@@ -17,6 +17,7 @@ function send_metrics() {
 }
 
 send_metrics runners.started
+send_metrics runners.up "1" "g"
 
 echo "Dropping traffic to metadata endpoint to avoid timeout"
 sudo iptables -I OUTPUT -d 169.254.169.254/32 -j REJECT --reject-with icmp-port-unreachable
@@ -97,7 +98,7 @@ provision_duration_ms=$(awk '{print $1*1000}' /proc/uptime)
 send_metrics runner.provision_duration $provision_duration_ms "ms|@1"
 
 function tail_log_for_duration {
-	( tail -f -n0 /var/log/cloud-init-output.log & ) | grep -q "Starting: Set up job"
+	( tail -f -n0 /var/log/cloud-init-output.log & ) | grep -q "Running job: "
 	start_time_ms=$(date +%s%3N)
 	( tail -f -n0 /var/log/cloud-init-output.log & ) | grep -q "Finishing: Complete job"
 	job_duration_ms=$(($(date +%s%3N)-start_time_ms))
@@ -108,6 +109,7 @@ tail_log_for_duration &
 ./run.sh
 
 if [[ $? -eq 0 ]]; then send_metrics jobs.completed; fi
+send_metrics runners.up "0" "g"
 
 ./config.sh remove --token "${TOKEN}" || true
 
