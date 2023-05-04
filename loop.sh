@@ -46,7 +46,7 @@ fi
 if [[ "$1" == "stop" ]]; then
 	pushd $workdir
 	echo "Stopping the VM..."
-	terraform destroy -auto-approve $tf_args -var token=$reg_token
+	terraform destroy -auto-approve $tf_args -var token=$reg_token -var url=x
 	exit 0
 fi
 
