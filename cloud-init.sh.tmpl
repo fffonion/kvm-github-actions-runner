@@ -100,7 +100,7 @@ send_metrics runner.provision_duration $provision_duration_ms "ms|@1"
 function tail_log_for_duration {
 	( tail -f -n0 /var/log/cloud-init-output.log & ) | grep -q "Running job: "
 	start_time_ms=$(date +%s%3N)
-	( tail -f -n0 /var/log/cloud-init-output.log & ) | grep -q "Finishing: Complete job"
+	( tail -f -n0 /var/log/cloud-init-output.log & ) | grep -q "completed with result: "
 	job_duration_ms=$(($(date +%s%3N)-start_time_ms))
 	send_metrics jobs.duration $job_duration_ms "ms|@1"
 }
