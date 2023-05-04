@@ -17,7 +17,14 @@ function send_metrics() {
 }
 
 send_metrics runners.started
-send_metrics runners.up "1" "g"
+
+function send_up_gauge() {
+	while true; do
+		send_metrics runners.up "1" "g"
+		sleep 30
+	done
+}
+send_up_gauge &
 
 echo "Dropping traffic to metadata endpoint to avoid timeout"
 sudo iptables -I OUTPUT -d 169.254.169.254/32 -j REJECT --reject-with icmp-port-unreachable
