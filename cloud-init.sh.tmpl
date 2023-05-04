@@ -6,6 +6,8 @@ if [[ $(whoami) == root ]]; then
 	exec sudo -H -u ubuntu bash $0
 fi
 
+cloud_image_serial=$(cat /etc/cloud/build.info |grep serial|awk '{print $2}')
+
 function send_metrics() {
 	v_img=$(cat /imagegeneration/imagedata.json|jq .[1].detail|grep -oP "Version: [\d\.]+"|awk '{print $2}')
 	v_base=$cloud_image_serial
@@ -80,7 +82,6 @@ tar xzf ./actions-runner-linux-x64-${RUNNER_VER}.tar.gz
 sudo mkdir /work
 sudo chown $USER /work
 
-cloud_image_serial=$(cat /etc/cloud/build.info |grep serial|awk '{print $2}')
 cat /imagegeneration/imagedata.json|jq  ".[1].detail |=  .+ \"\nCloud Image Serial: $cloud_image_serial\"" > .setup_info
 
 ./config.sh \
