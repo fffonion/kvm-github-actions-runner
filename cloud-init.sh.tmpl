@@ -6,8 +6,6 @@ if [[ $(whoami) == root ]]; then
 	exec sudo -H -u ubuntu bash $0
 fi
 
-start_ms=$(date +%s%3N)
-
 function send_metrics() {
 	v_img=$(cat /imagegeneration/imagedata.json|jq .[1].detail|grep -oP "Version: [\d\.]+"|awk '{print $2}')
 	v_base=$cloud_image_serial
@@ -95,16 +93,21 @@ function finish {
 }
 trap finish EXIT
 
-register_ms=$(date +%s%3N)
-provision_duration_ms=$(($register_ms-$start_ms))
+provision_duration_ms=$(awk '{print $1*1000}' /proc/uptime)
 send_metrics runner.provision_duration $provision_duration_ms "ms|@1"
+
+function tail_log_for_duration {
+	( tail -f -n0 /var/log/cloud-init-output.log & ) | grep -q "Starting: Set up job"
+	start_time_ms=$(date +%s%3N)
+	( tail -f -n0 /var/log/cloud-init-output.log & ) | grep -q "Finishing: Complete job"
+	job_duration_ms=$(($(date +%s%3N)-start_time_ms))
+	send_metrics jobs.duration $job_duration_ms "ms|@1"
+}
+tail_log_for_duration &
 
 ./run.sh
 
 if [[ $? -eq 0 ]]; then send_metrics jobs.completed; fi
-
-job_duration_ms=$(($(date +%s%3N)-register_ms))
-send_metrics jobs.duration $job_duration_ms "ms|@1"
 
 ./config.sh remove --token "${TOKEN}" || true
 
