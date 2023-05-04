@@ -27,11 +27,6 @@ if [[ -z $NAME ]]; then
 	exit 1
 fi
 
-if [[ -z $RUNNER_VERSION ]]; then
-	echoerr '$RUNNER_VERSION is required'
-	exit 1
-fi
-
 urlvar=""
 if [[ ! -z $REPO ]]; then
 	urlvar=https://github.com/$REPO
@@ -67,7 +62,7 @@ fi
 
 terraform init -upgrade
 
-tf_args="-var url=$urlvar -var runner_version=$RUNNER_VERSION -var docker_user=$DOCKER_USER -var docker_pass=$DOCKER_PASS -var name=$namevar -var labels=$LABELS -var runnergroup=$RUNNERGROUP"
+tf_args="-var url=$urlvar -var docker_user=$DOCKER_USER -var docker_pass=$DOCKER_PASS -var name=$namevar -var labels=$LABELS -var runnergroup=$RUNNERGROUP"
 
 if [[ "$1" == "reload" ]]; then
 	exit 0
