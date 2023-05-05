@@ -117,7 +117,7 @@ tail_log_for_duration &
 ./run.sh
 
 if [[ $? -eq 0 ]]; then send_metrics jobs.completed; fi
-send_metrics runners.up "0" "g"
+# send_metrics runners.up "0" "g"
 
 ./config.sh remove --token "${TOKEN}" || true
 
