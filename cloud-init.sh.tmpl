@@ -21,7 +21,7 @@ function send_metrics() {
 function send_logs() {
 	v_img=$(cat /imagegeneration/imagedata.json|jq .[1].detail|grep -oP "Version: [\d\.]+"|awk '{print $2}')
 	v_base=$cloud_image_serial
-	entry='{"runner_name":"${NAME}","runner_group":"${RUNNERGROUP}","runner_image_version":"$v_img","cloud_image_serial":"$v_base","job_duration":"$1"}'
+	entry="{\"runner_name\":\"${NAME}\",\"runner_group\":\"${RUNNERGROUP}\",\"runner_image_version\":\"$v_img\",\"cloud_image_serial\":\"$v_base\",\"job_duration\":\"$1\"}"
 	echo "Send logs $entry to $host"
 	echo -n "$entry" > /dev/udp/$dd_host/10518
 
