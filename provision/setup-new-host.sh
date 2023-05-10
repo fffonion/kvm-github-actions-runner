@@ -45,3 +45,9 @@ sudo cp $REPO_PATH/self-hosted-kvm@.service /etc/systemd/system/self-hosted-kvm@
 sudo systemctl daemon-reload
 
 sudo mkdir -p /root/vms
+
+
+###### datadog ######
+
+$REPO_PATH/provision/setup-datadog.sh
+
