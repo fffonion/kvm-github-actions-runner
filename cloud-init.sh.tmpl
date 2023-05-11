@@ -93,6 +93,7 @@ sudo chown $USER /work
 
 cat /imagegeneration/imagedata.json|jq  ".[1].detail |=  .+ \"\nCloud Image Serial: $cloud_image_serial\"" > .setup_info
 
+IFS=$'\r\n'
 ./config.sh \
 	--unattended \
 	--replace \
@@ -102,7 +103,11 @@ cat /imagegeneration/imagedata.json|jq  ".[1].detail |=  .+ \"\nCloud Image Seri
 	--labels "${LABELS}" \
 	--runnergroup "${RUNNERGROUP}" \
 	--url "${URL}" \
-	--token "${TOKEN}"
+	--token "${TOKEN}" | while read line; do
+		echo $line
+		send_logs runner_log $line
+done
+IFS=$' \t\n'
 
 send_metrics runners.registered
 
