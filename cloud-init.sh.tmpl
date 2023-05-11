@@ -114,6 +114,7 @@ trap finish EXIT
 provision_duration_ms=$(awk '{print $1*1000}' /proc/uptime)
 send_metrics runner.provision_duration $provision_duration_ms "ms|@1"
 
+IFS=$'\r\n'
 ./run.sh | while read line; do
 	echo $line
 	if echo $line | grep -q "Running job: "; then
@@ -125,6 +126,7 @@ send_metrics runner.provision_duration $provision_duration_ms "ms|@1"
 	fi
 	send_logs runner_log $line
 done
+IFS=$' \t\n'
 
 status=$?
 if [[ $status -eq 0 ]]; then send_metrics jobs.completed; fi
