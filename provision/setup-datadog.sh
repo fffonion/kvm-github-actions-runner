@@ -2,7 +2,9 @@
 
 # wget
 # update bind_host to bridge
-sed -i.bak  's/.*logs_enabled:.*/logs_enabled: true/g' /etc/datadog-agent/datadog.yaml
+sed -i.bak 's/.*logs_enabled:.*/logs_enabled: true/g' /etc/datadog-agent/datadog.yaml
+sed -i.bak 's/.*histogram_aggregates:.*/histogram_aggregates: ["max","medium","avg","count","sum"]/' /etc/datadog-agent/datadog.yaml
+
 cat << EOF > /etc/datadog-agent/conf.d/self-hosted.yml
 logs:
   - type: udp
