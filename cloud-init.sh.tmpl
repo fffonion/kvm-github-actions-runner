@@ -13,7 +13,8 @@ dd_tags="#runner_name:${NAME},#runner_group:${RUNNERGROUP},#runner_image_version
 dd_host="10.1.0.1"
 
 function send_metrics() {
-	metrics="github.actions.$1:$${2:-1}|$${3:-c}|$4"
+	metrics="github.actions.$1:$${2:-1}|$${3:-c}"
+	if [[ ! -z "$4" ]]; then metrics="$metrics|$4"; fi
 	echo "Send metrics $metrics to $dd_host"
 	echo -n "$metrics" > /dev/udp/$dd_host/8125
 }
