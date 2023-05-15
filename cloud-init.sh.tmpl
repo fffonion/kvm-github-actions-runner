@@ -9,12 +9,11 @@ fi
 cloud_image_serial=$(cat /etc/cloud/build.info |grep serial|awk '{print $2}')
 runner_image_version=$(cat /imagegeneration/imagedata.json|jq .[1].detail|grep -oP "Version: [\d\.]+"|awk '{print $2}')
 
-dd_tags="#runner_name:${NAME},#runner_group:${RUNNERGROUP},#runner_image_version:$runner_image_version,#cloud_image_serial:$cloud_image_serial"
 dd_host="10.1.0.1"
 
 function send_metrics() {
-	metrics="github.actions.$1:$${2:-1}|$${3:-c}"
-	if [[ ! -z "$4" ]]; then metrics="$metrics|$4"; fi
+	metrics="github.actions.$1:$${2:-1}|$${3:-c}|#runner_group:${RUNNERGROUP},#runner_image_version:$runner_image_version,#cloud_image_serial:$cloud_image_serial"
+	if [[ ! -z "$4" ]]; then metrics="$metrics,$4"; fi
 	echo "Send metrics $metrics to $dd_host"
 	echo -n "$metrics" > /dev/udp/$dd_host/8125
 }
@@ -30,7 +29,7 @@ send_metrics runners.started
 
 function send_up_gauge() {
 	while true; do
-		send_metrics runners.up "1" "g" "$dd_tags"
+		send_metrics runners.up "1" "g" "#runner_name:${NAME}"
 		sleep 30
 	done
 }
