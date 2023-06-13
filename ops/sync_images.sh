@@ -1,7 +1,7 @@
 #!/bin/bash
 from=runner2
 total_runners=13
-file_name=/root/ubuntu-22.04-20230507.1
+file_name=/root/ubuntu-22.04-20230611.1
 
 function get_ip() {
     ssh $1 curl -s cidr.me/ip
