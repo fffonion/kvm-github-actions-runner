@@ -18,7 +18,7 @@ resource "libvirt_volume" "base_volume-20230507-1" {
   pool   = libvirt_pool.kong.name
 }
 
-resource "libvirt_volume" "base_volume-20230507-2" {
+resource "libvirt_volume" "base_volume-20230611-1" {
   name   = "runner-ubuntu-22.04-${local.image_version}.qcow2"
   source = "/root/ubuntu-22.04-${local.image_version}"
   format = "qcow2"
