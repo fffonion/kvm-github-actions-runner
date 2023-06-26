@@ -1,4 +1,4 @@
 locals {
-  image_version  = "20230611.1"
-  runner_version = "2.304.0"
+  image_version  = "20230619.1"
+  runner_version = "2.305.0"
 }
