@@ -6,7 +6,10 @@ After=network.target
 Type=simple
 User=root
 Restart=always
+# Restart in 5, 16, 27, 38, 49, 60, 60... seconds
 RestartSec=5s
+RestartSteps=5
+RestartMaxDelaySec=60s
 ExecStart=/root/self-hosted-kvm/loop.sh
 ExecStop=/root/self-hosted-kvm/loop.sh stop
 ExecReload=/root/self-hosted-kvm/loop.sh reload
