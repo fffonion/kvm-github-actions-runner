@@ -11,14 +11,14 @@ provider "libvirt" {
 }
 
 # the previous version of the image to keep during migration
-resource "libvirt_volume" "base_volume-20230619-1" {
-  name   = "runner-ubuntu-22.04-20230619.1.qcow2"
-  source = "/root/ubuntu-22.04-20230619.1"
+resource "libvirt_volume" "base_volume-20230702-1" {
+  name   = "runner-ubuntu-22.04-20230702.1.qcow2"
+  source = "/root/ubuntu-22.04-20230702.1"
   format = "qcow2"
   pool   = libvirt_pool.kong.name
 }
 
-resource "libvirt_volume" "base_volume-20230702-1" {
+resource "libvirt_volume" "base_volume-20230728-3" {
   name   = "runner-ubuntu-22.04-${local.image_version}.qcow2"
   source = "/root/ubuntu-22.04-${local.image_version}"
   format = "qcow2"
