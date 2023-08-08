@@ -1,7 +1,7 @@
 #!/bin/bash
 from=runner2
 total_runners=13
-file_name=/root/ubuntu-22.04-20230728.3
+file_name=/root/ubuntu-22.04-$(cat $(dirname $0)/../local.tf|grep image_version|cut -d '"' -f2)
 
 function get_ip() {
     ssh $1 curl -s cidr.me/ip
