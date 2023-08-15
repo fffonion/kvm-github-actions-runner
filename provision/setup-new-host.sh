@@ -26,10 +26,14 @@ sudo usermod -aG libvirt $USER
 ###### terraform ######
 
 TF_VER=1.4.2
-wget https://releases.hashicorp.com/terraform/${TF_VER}/terraform_${TF_VER}_linux_amd64.zip
-unzip terraform_${TF_VER}_linux_amd64.zip
+ARCH=$(arch)
+if [[ $ARCH == "x86_64" ]]; then ARCH=amd64
+else ARCH=arm64
+fi
+wget https://releases.hashicorp.com/terraform/${TF_VER}/terraform_${TF_VER}_linux_${ARCH}.zip
+unzip terraform_${TF_VER}_linux_${ARCH}.zip
 mv terraform /usr/local/bin/terraform
-rm terraform_${TF_VER}_linux_amd64.zip
+rm terraform_${TF_VER}_linux_${ARCH}.zip
 
 sudo rm -rf /var/lib/libvirt/images/*
 
