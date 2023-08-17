@@ -123,7 +123,7 @@ send_metrics runner.provision_duration $provision_duration_ms "ms|@1"
 ulimit -c unlimited -H
 
 IFS=$'\r\n'
-./run.sh | while read line; do
+bash -c "./run.sh" | while read line; do
 	echo $line
 	if echo $line | grep -q "Running job: "; then
 		start_time_ms=$(date +%s%3N)
