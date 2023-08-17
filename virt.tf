@@ -9,8 +9,8 @@ resource "libvirt_volume" "master" {
 # Define KVM domain to create
 resource "libvirt_domain" "test" {
   name   = "${var.name}-runner"
-  memory = "7168"
-  vcpu   = 2
+  memory = var.memory
+  vcpu   = var.cpu
 
   cpu {
     mode = "host-passthrough"
@@ -28,11 +28,10 @@ resource "libvirt_domain" "test" {
     xslt = file("patch-cdrom-sata.xsl")
   }
 
-  # ARM64
-  machine = "virt"
+  machine = var.arm64 ? "virt" : "pc"
   nvram {
-    file = "/usr/share/AAVMF/AAVMF_CODE.fd"
-    template = "flash1.img"
+    file     = var.arm64 ? "/usr/share/AAVMF/AAVMF_CODE.fd" : ""
+    template = var.arm64 ? "flash1.img" : ""
   }
 
   # IMPORTANT: this is a known bug on cloud images, since they expect a console

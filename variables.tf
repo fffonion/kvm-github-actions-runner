@@ -37,3 +37,18 @@ variable "docker_pass" {
   default = ""
 }
 
+variable "arm64" {
+  description = "apply ARM64 specific configs"
+  type        = bool
+  default     = false
+}
+
+variable "cpu" {
+  type    = number
+  default = 2
+}
+
+variable "memory" {
+  type    = number
+  default = 7168
+}

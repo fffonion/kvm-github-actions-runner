@@ -43,10 +43,24 @@ if [[ -e $workdir/terraform.tfstate ]]; then
 	cp $workdir/terraform.tfstate* $statedir
 fi
 
+tf_args="-var url=$urlvar -var docker_user=$DOCKER_USER -var docker_pass=$DOCKER_PASS -var name=$namevar -var labels=$LABELS -var runnergroup=$RUNNERGROUP"
+
+if [[ $(arch) == "aarch64" ]]; then
+	tf_args="$tf_args -var arm64=true"
+fi
+
+if [[ ! -z $CPU ]]; then
+	tf_args="$tf_args -var cpu=$CPU"
+fi
+
+if [[ ! -z $MEMORY ]]; then
+	tf_args="$tf_args -var memory=$MEMORY"
+fi
+
 if [[ "$1" == "stop" ]]; then
 	pushd $workdir
 	echo "Stopping the VM..."
-	terraform destroy -auto-approve $tf_args -var token=$reg_token -var url=x
+	terraform destroy -lock-timeout=15s -auto-approve $tf_args -var token=x
 	exit 0
 fi
 
@@ -61,8 +75,6 @@ if [[ -e $statedir/terraform.tfstate ]]; then
 fi
 
 terraform init -upgrade
-
-tf_args="-var url=$urlvar -var docker_user=$DOCKER_USER -var docker_pass=$DOCKER_PASS -var name=$namevar -var labels=$LABELS -var runnergroup=$RUNNERGROUP"
 
 if [[ "$1" == "reload" ]]; then
 	exit 0
@@ -126,7 +138,11 @@ while true; do
 			plan=$(timeout 10 terraform plan $tf_args -var token=$reg_token -detailed-exitcode)
 			# we only re-apply when instance exists/job finishes
 			# also ignore timeouts
-			if [[ $? -ne 0 && ! $(echo "$plan"|grep running|grep -q false) ]]; then
+			# break out loop if 1) we change from stopped to running, or 2) first time
+			if [[ $? -ne 0 && (
+					! -z $(echo "$plan" | grep "running" | grep "false") ||
+					! -z $(echo "$plan" | grep "libvirt_domain.test" |grep "will be created")
+				) ]]; then
 				break
 			fi
 			sleep 5
