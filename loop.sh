@@ -134,6 +134,12 @@ while true; do
 
 		echo "Reprovisioning the VM..."
 		terraform taint libvirt_volume.master || true
+		
+		# prepare new nvram overlay for uefi used by aarch64
+		if [[ -e /usr/share/AAVMF/AAVMF_CODE.fd ]]; then
+			sudo cp /usr/share/AAVMF/AAVMF_CODE.fd flash1.img
+		fi
+
 		set -x
 		terraform apply -auto-approve $tf_args -var token=$reg_token
 		set +x

@@ -22,6 +22,19 @@ resource "libvirt_domain" "test" {
     volume_id = libvirt_volume.master.id
   }
 
+  xml {
+    # patch to use sata controller to compat in arm64
+    # https://github.com/dmacvicar/terraform-provider-libvirt/issues/885
+    xslt = file("patch-cdrom-sata.xsl")
+  }
+
+  # ARM64
+  machine = "virt"
+  nvram {
+    file = "/usr/share/AAVMF/AAVMF_CODE.fd"
+    template = "flash1.img"
+  }
+
   # IMPORTANT: this is a known bug on cloud images, since they expect a console
   # we need to pass it
   # https://bugs.launchpad.net/cloud-images/+bug/1573095
