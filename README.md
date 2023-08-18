@@ -42,6 +42,9 @@ RUNNERGROUP=awesome group
 RUNNER_VERSION=2.303.0
 DOCKER_USER=<docker user that access to public registry, to increase pull rate limit only>
 DOCKER_PASS=<the password>
+
+CPU=2 # vCPU count, default to 2
+MEMORY=7168 # memory in MB, default to 7168
 EOF
 
 # start the managing process as well the VMs
