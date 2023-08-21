@@ -25,7 +25,7 @@ resource "libvirt_domain" "test" {
   xml {
     # patch to use sata controller to compat in arm64
     # https://github.com/dmacvicar/terraform-provider-libvirt/issues/885
-    xslt = file("patch-cdrom-sata.xsl")
+    xslt = var.arm64 ? file("patch-cdrom-sata.xsl") : ""
   }
 
   machine = var.arm64 ? "virt" : "pc"
