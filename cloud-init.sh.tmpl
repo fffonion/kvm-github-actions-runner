@@ -122,13 +122,8 @@ trap finish EXIT
 provision_duration_ms=$(awk '{print $1*1000}' /proc/uptime)
 send_metrics runner.provision_duration $provision_duration_ms "ms|@1"
 
-# set coredump hard ulimit
-# when cloud-init starts pam_limits are not loaded yet thus the default limits
-# visible to shell are not set for runner process
-ulimit -c unlimited -H
-
 IFS=$'\r\n'
-bash -c "./run.sh" | while read line; do
+./run.sh | while read line; do
 	echo $line
 	if echo $line | grep -q "Running job: "; then
 		start_time_ms=$(date +%s%3N)
