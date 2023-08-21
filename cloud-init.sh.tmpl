@@ -114,7 +114,10 @@ IFS=$' \t\n'
 
 
 # temporary hack
-if [[ ! -e /home/ubuntu/.runner ]]; then
+runner_config=/home/ubuntu/actions-runner/.runner
+if [[ ! -e $runner_config ]]; then
+    send_logs runner_log "First pass not authenticated, trying hack way"
+
     IFS=$'\r\n'
 
     ./config.sh \
@@ -129,22 +132,11 @@ if [[ ! -e /home/ubuntu/.runner ]]; then
                     echo $line
                     send_logs runner_log $line
     done
-    ./config.sh remove --token "${TOKEN}"
-    ./config.sh \
-            --unattended \
-            --replace \
-            --ephemeral \
-            --name "${NAME}" \
-            --work /work \
-            --labels "${LABELS}" \
-            --runnergroup "${RUNNERGROUP}" \
-            --url "${URL}" \
-            --token "${TOKEN}" | while read line; do
-                    echo $line
-                    send_logs runner_log $line
-    done
 
     IFS=$' \t\n'
+
+    jq '.ephemeral=true' $runner_config > x.runner
+    mv x.runner $runner_config
 fi
 
 send_metrics runners.registered
