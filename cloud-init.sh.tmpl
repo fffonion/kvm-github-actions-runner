@@ -100,20 +100,6 @@ IFS=$'\r\n'
 ./config.sh \
 	--unattended \
 	--replace \
-	--name "${NAME}" \
-	--work /work \
-	--labels "${LABELS}" \
-	--runnergroup "${RUNNERGROUP}" \
-	--url "${URL}" \
-	--token "${TOKEN}" | while read line; do
-		echo $line
-		send_logs runner_log $line
-done
-# temporary hack
-./config.sh remove --token "${TOKEN}"
-./config.sh \
-	--unattended \
-	--replace \
 	--ephemeral \
 	--name "${NAME}" \
 	--work /work \
@@ -124,8 +110,42 @@ done
 		echo $line
 		send_logs runner_log $line
 done
-
 IFS=$' \t\n'
+
+
+# temporary hack
+if [[ ! -e /home/ubuntu/.runner ]]; then
+    IFS=$'\r\n'
+
+    ./config.sh \
+            --unattended \
+            --replace \
+            --name "${NAME}" \
+            --work /work \
+            --labels "${LABELS}" \
+            --runnergroup "${RUNNERGROUP}" \
+            --url "${URL}" \
+            --token "${TOKEN}" | while read line; do
+                    echo $line
+                    send_logs runner_log $line
+    done
+    ./config.sh remove --token "${TOKEN}"
+    ./config.sh \
+            --unattended \
+            --replace \
+            --ephemeral \
+            --name "${NAME}" \
+            --work /work \
+            --labels "${LABELS}" \
+            --runnergroup "${RUNNERGROUP}" \
+            --url "${URL}" \
+            --token "${TOKEN}" | while read line; do
+                    echo $line
+                    send_logs runner_log $line
+    done
+
+    IFS=$' \t\n'
+fi
 
 send_metrics runners.registered
 
