@@ -3,7 +3,8 @@
 if [[ $(whoami) == root ]]; then
 	echo "Respawning myself as non root"
 	chmod 777 $0 # yay
-	exec sudo -H -u ubuntu bash $0
+        # use su instead of su to let new shell able to use ulimit
+        exec su ubuntu -c "bash $0"
 fi
 
 cloud_image_serial=$(cat /etc/cloud/build.info |grep serial|awk '{print $2}')
