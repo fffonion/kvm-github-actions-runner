@@ -1,7 +1,17 @@
 #!/bin/bash
-from=runner2
-total_runners=13
-file_name=/root/ubuntu-22.04-$(cat $(dirname $0)/../local.tf|grep image_version|cut -d '"' -f2)
+from=${1:-runner2}
+total_runners=${2:-13}
+image_version=$(cat $(dirname $0)/../local.tf|grep image_version|cut -d '"' -f2)
+image_version=${3:-image_version}
+file_name=/root/ubuntu-22.04-$image_version
+
+if [[ $from == *a ]]; then
+    suffix="a"
+fi
+
+echo "* Image to copy: $file_name"
+echo "* Bootstrap node: $from"
+echo "* Total runners: $total_runners"
 
 function get_ip() {
     ssh $1 curl -s cidr.me/ip
@@ -13,10 +23,11 @@ function get_user() {
 
 pending_hosts=("$from")
 for i in $(seq 1 $total_runners); do
-    if [[ "runner$i" == "$from" ]]; then
+    if [[ "runner$i$suffix" == "$from" ]]; then
         continue
     fi
-    pending_hosts+=("runner$i")
+    echo  "******" runner$i$suffix
+    pending_hosts+=("runner$i$suffix")
 done
 
 function do_copy() {
