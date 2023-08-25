@@ -60,18 +60,18 @@ fi
 if [[ "$1" == "stop" ]]; then
 	pushd $workdir
 	echo "Stopping the VM..."
-	terraform destroy -lock-timeout=15s -auto-approve $tf_args -var token=x
+	terraform destroy -lock-timeout=30s -auto-approve $tf_args -var token=x
 	exit 0
 fi
 
-rm -rf $workdir/*
+rm $workdir/*.* || true
 mkdir -p $workdir
 cp -r $(dirname $(readlink -f $0))/* $workdir/
 pushd $workdir
 
 rm terraform.tfstate* -f
 if [[ -e $statedir/terraform.tfstate ]]; then
-	cp $statedir/terraform.tfstate* $workdir
+	cp $statedir/terraform.tfstate* $workdir/
 fi
 
 terraform init -upgrade
@@ -170,6 +170,8 @@ while true; do
 
 		checkdrain
 	done
+
+	sleep 30
 done
 
 echoerr "Should not reach here"
