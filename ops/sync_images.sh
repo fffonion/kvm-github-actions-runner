@@ -2,7 +2,7 @@
 from=${1:-runner2}
 total_runners=${2:-13}
 image_version=$(cat $(dirname $0)/../local.tf|grep image_version|cut -d '"' -f2)
-image_version=${3:-image_version}
+image_version=${3:-$image_version}
 file_name=/root/ubuntu-22.04-$image_version
 
 if [[ $from == *a ]]; then
@@ -26,7 +26,6 @@ for i in $(seq 1 $total_runners); do
     if [[ "runner$i$suffix" == "$from" ]]; then
         continue
     fi
-    echo  "******" runner$i$suffix
     pending_hosts+=("runner$i$suffix")
 done
 
