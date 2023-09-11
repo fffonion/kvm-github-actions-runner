@@ -57,10 +57,27 @@ if [[ ! -z $MEMORY ]]; then
 	tf_args="$tf_args -var memory=$MEMORY"
 fi
 
+function do_cleanup() {
+       set -x
+       if [[ $(arch) == "aarch64" ]]; then
+           undefine_args="--nvram"
+       fi
+
+       virsh -c qemu:///system destroy ${namevar}-runner
+       virsh -c qemu:///system undefine $undefine_args ${namevar}-runner
+
+       virsh vol-delete ${namevar}-commoninit.iso kong
+       virsh vol-delete ${namevar}-master.iso kong
+
+       terraform destroy -lock-timeout=30s -auto-approve $tf_args -var token=x
+       set +x
+}
+
 if [[ "$1" == "stop" ]]; then
 	pushd $workdir
 	echo "Stopping the VM..."
-	terraform destroy -lock-timeout=30s -auto-approve $tf_args -var token=x
+        set +e
+	do_cleanup
 	exit 0
 fi
 
@@ -157,7 +174,7 @@ while true; do
 		fi
 
 		set -x
-		terraform apply -auto-approve $tf_args -var token=$reg_token
+                terraform apply -auto-approve $tf_args -var token=$reg_token || (do_cleanup; terraform apply -auto-approve $tf_args -var token=$reg_token)
 		set +x
 		old_token=$reg_token
 
