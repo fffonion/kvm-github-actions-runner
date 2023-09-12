@@ -1,5 +1,5 @@
 [Unit]
-Description=Self hosted github actions runner in KVM
+Description=Self hosted github actions runner in KVM (%i)
 After=network.target
 
 [Service]
