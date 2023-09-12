@@ -154,67 +154,74 @@ while true; do
 	echo "Reg token is obtained using $token_method: $reg_token"
 
         watch_dog_check=0
+        need_respawn=0
 	while [[ $(date +%s) -lt $token_expire ]]; do
-		while [[ ! -z $(terraform state list) ]]; do
+                # check reload flag
+                if [[ -e $reload_file ]]; then
+                    rm -f $reload_file
+                    # respawn
+                    echo "Reloading loop.sh"
+                    exec $0
+                fi
+
+                # check drain flag
+		checkdrain
+
+                # check terraform state
+		if [[ ! -z $(terraform state list) ]]; then
 			plan=$(timeout 10 terraform plan $tf_args -var token=$reg_token -detailed-exitcode)
 			# we only re-apply when instance exists/job finishes
 			# also ignore timeouts
-			# break out loop if 1) we change from stopped to running, or 2) first time
+			# mark as respawn if 1) we change from stopped to running, or 2) first time
 			if [[ $? -ne 0 && (
 					! -z $(echo "$plan" | grep "running" | grep "false") ||
 					! -z $(echo "$plan" | grep "libvirt_domain.test" |grep "will be created")
 				) ]]; then
-				break
+                                need_respawn=1
 			fi
-
-                        # check health
-                        if [[ $(arch) == "x86_64" ]]; then
-                            irq=$(virsh qemu-monitor-command ${namevar}-runner --hmp info irq|cut -d: -f2|sort -r|head -n1)
-                            if [[ ! -z $irq && $irq -lt 10 ]]; then
-                                let watch_dog_check=watch_dog_check+1
-                                if [[ $watch_dog_check -gt 60 ]]; then
-                                    echo "IRQ is less than 10 for 5 minutes, recreating VM"
-                                    watch_dog_check=0
-                                    break
-                                fi
-                            else
-                                watch_dog_check=0
-                            fi
-                        fi
-
-                        # check reload
-                        if [[ -e $reload_file ]]; then
-                            rm -f $reload_file
-                            # respawn
-                            echo "Reloading loop.sh"
-                            exec $0
-                        fi
-
-			sleep 5
-		done
-
-		echo "Reprovisioning the VM..."
-		terraform taint libvirt_volume.master || true
-		
-		# prepare new nvram overlay for uefi used by aarch64
-		if [[ -e /usr/share/AAVMF/AAVMF_CODE.fd ]]; then
-			sudo cp /usr/share/AAVMF/AAVMF_CODE.fd flash1.img
-		fi
-
-		set -x
-                terraform apply -auto-approve $tf_args -var token=$reg_token || (do_cleanup; terraform apply -auto-approve $tf_args -var token=$reg_token)
-		set +x
-		old_token=$reg_token
-
-		sleep 5
-
-                # don't cache the token if it's returned by lambda: it's already cached
-                if [[ $token_method == "lambda" ]]; then
-                   break
+                else # not created
+                    need_respawn=1
                 fi
 
-		checkdrain
+                # check health
+                if [[ $(arch) == "x86_64" ]]; then
+                    irq=$(virsh qemu-monitor-command ${namevar}-runner --hmp info irq|cut -d: -f2|sort -r|head -n1)
+                    if [[ ! -z $irq && $irq -lt 10 ]]; then
+                        let watch_dog_check=watch_dog_check+1
+                        if [[ $watch_dog_check -gt 60 ]]; then
+                            echo "IRQ is less than 10 for 5 minutes, recreating VM"
+                            watch_dog_check=0
+                            need_respawn=1
+                        fi
+                    else
+                        watch_dog_check=0
+                    fi
+                fi
 
+                if [[ $need_respawn -eq 1 ]]; then
+                    echo "Reprovisioning the VM..."
+                    terraform taint libvirt_volume.master || true
+                    
+                    # prepare new nvram overlay for uefi used by aarch64
+                    if [[ -e /usr/share/AAVMF/AAVMF_CODE.fd ]]; then
+                            sudo cp /usr/share/AAVMF/AAVMF_CODE.fd flash1.img
+                    fi
+
+                    set -x
+                    terraform apply -auto-approve $tf_args -var token=$reg_token || (do_cleanup; terraform apply -auto-approve $tf_args -var token=$reg_token)
+                    set +x
+                    need_respawn=0
+                    old_token=$reg_token
+
+                    sleep 5
+
+                    # don't cache the token if it's returned by lambda: it's already cached
+                    if [[ $token_method == "lambda" ]]; then
+                       break
+                    fi
+                fi
+
+                sleep 5
 	done
 
 	sleep 30
