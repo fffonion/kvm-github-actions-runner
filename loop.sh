@@ -150,6 +150,7 @@ while true; do
 
 	echo "Reg token is obtained using $token_method: $reg_token"
 
+        watch_dog_check=0
 	while [[ $(date +%s) -lt $token_expire ]]; do
 		while [[ ! -z $(terraform state list) ]]; do
 			plan=$(timeout 10 terraform plan $tf_args -var token=$reg_token -detailed-exitcode)
@@ -162,6 +163,22 @@ while true; do
 				) ]]; then
 				break
 			fi
+
+                        # check health
+                        if [[ $(arch) == "x86_64" ]]; then
+                            irq=$(virsh qemu-monitor-command ${namevar}-runner --hmp info irq|cut -d: -f2|sort -r|head -n1)
+                            if [[ ! -z $irq && $irq -lt 10 ]]; then
+                                let watch_dog_check=watch_dog_check+1
+                                if [[ $watch_dog_check -gt 60 ]]; then
+                                    echo "IRQ is less than 10 for 5 minutes, recreating VM"
+                                    watch_dog_check=0
+                                    break
+                                fi
+                            else
+                                watch_dog_check=0
+                            fi
+                        fi
+
 			sleep 5
 		done
 
@@ -186,6 +203,7 @@ while true; do
                 fi
 
 		checkdrain
+
 	done
 
 	sleep 30
