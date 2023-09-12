@@ -211,14 +211,8 @@ while true; do
                     terraform apply -auto-approve $tf_args -var token=$reg_token || (do_cleanup; terraform apply -auto-approve $tf_args -var token=$reg_token)
                     set +x
                     need_respawn=0
-                    old_token=$reg_token
 
                     sleep 5
-
-                    # don't cache the token if it's returned by lambda: it's already cached
-                    if [[ $token_method == "lambda" ]]; then
-                       break
-                    fi
                 fi
 
                 sleep 5
