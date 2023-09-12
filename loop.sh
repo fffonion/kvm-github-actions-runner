@@ -43,6 +43,8 @@ if [[ -e $workdir/terraform.tfstate ]]; then
 	cp $workdir/terraform.tfstate* $statedir
 fi
 
+reload_file=/tmp/self-hosted-kvm@${namevar}.reload
+
 tf_args="-var url=$urlvar -var docker_user=$DOCKER_USER -var docker_pass=$DOCKER_PASS -var name=$namevar -var labels=$LABELS -var runnergroup=$RUNNERGROUP"
 
 if [[ $(arch) == "aarch64" ]]; then
@@ -94,6 +96,7 @@ fi
 terraform init -upgrade
 
 if [[ "$1" == "reload" ]]; then
+        touch $reload_file
 	exit 0
 fi
 
@@ -177,6 +180,14 @@ while true; do
                             else
                                 watch_dog_check=0
                             fi
+                        fi
+
+                        # check reload
+                        if [[ -e $reload_file ]]; then
+                            rm -f $reload_file
+                            # respawn
+                            echo "Reloading loop.sh"
+                            exec $0
                         fi
 
 			sleep 5
