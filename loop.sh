@@ -12,6 +12,15 @@ function checkdrain() {
 	fi
 }
 
+dd_host="10.1.0.1"
+
+function send_metrics() {
+	metrics="github.actions.$1:${2:-1}|${3:-c}|#runner_group:${RUNNERGROUP}"
+	if [[ ! -z "$4" ]]; then metrics="$metrics,$4"; fi
+	echo "Send metrics $metrics to $dd_host"
+	echo -n "$metrics" > /dev/udp/$dd_host/8125
+}
+
 
 if [[ -n $REG_TOKEN_LAMBDA_URL && -n $REG_TOKEN_LAMBDA_APIKEY ]]; then
 	echo "Using lambda to get reg token"
@@ -34,6 +43,7 @@ else
 	urlvar=https://github.com/$ORG
 fi
 namevar="$(hostname)-$NAME"
+
 
 mkdir -p /root/vms
 workdir=/root/vms/self-hosted-kvm-tf-$NAME
@@ -148,6 +158,7 @@ while true; do
 
 	if [[ -z $reg_token || $reg_token == "null" ]]; then
 		echoerr "Unable to get registration token using $token_method, error was $reg_token_ret"
+                send_metrics runners.anomaly "1" "c" "#runner_name:${namevar},#type:get_token_failed" 
 		exit 1
 	fi
 
@@ -192,6 +203,7 @@ while true; do
                         if [[ $watch_dog_check -gt 180 ]]; then
                             echo "IRQ is less than 10 for 30 minutes, recreating VM"
                             echo "Not recreating for testing"
+                            send_metrics runners.anomaly "1" "c" "#runner_name:${namevar},#type:vm_force_recreate" 
                             ## do_cleanup
                             # reset counter
                             watch_dog_check=0
@@ -212,7 +224,11 @@ while true; do
                     fi
 
                     set -x
-                    terraform apply -auto-approve $tf_args -var token=$reg_token || (do_cleanup; terraform apply -auto-approve $tf_args -var token=$reg_token)
+                    terraform apply -auto-approve $tf_args -var token=$reg_token || (
+                        send_metrics runners.anomaly "1" "c" "#runner_name:${namevar},#type:vm_tfstate_broken";
+                        do_cleanup;
+                        terraform apply -auto-approve $tf_args -var token=$reg_token
+                    )
                     set +x
                     need_respawn=0
 
