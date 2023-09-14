@@ -191,10 +191,11 @@ while true; do
                         let watch_dog_check=watch_dog_check+1
                         if [[ $watch_dog_check -gt 60 ]]; then
                             echo "IRQ is less than 10 for 5 minutes, recreating VM"
-                            do_cleanup
+                            echo "Not recreating for testing"
+                            ## do_cleanup
                             # reset counter
                             watch_dog_check=0
-                            need_respawn=1
+                            ## need_respawn=1
                         fi
                     else
                         watch_dog_check=0
