@@ -200,8 +200,8 @@ while true; do
                     irq=$(virsh qemu-monitor-command ${namevar}-runner --hmp info irq|cut -d: -f2|sort -nr|head -n1|grep -oP "\d+")
                     if [[ ! -z $irq && $irq -lt 10 ]]; then
                         let watch_dog_check=watch_dog_check+1
-                        if [[ $watch_dog_check -gt 180 ]]; then
-                            echo "IRQ is less than 10 for 30 minutes, recreating VM"
+                        if [[ $watch_dog_check -gt 120 ]]; then
+                            echo "IRQ is less than 10 for 10 minutes, recreating VM"
                             echo "Not recreating for testing"
                             send_metrics runners.anomaly "1" "c" "#runner_name:${namevar},#type:vm_force_recreate" 
                             ## do_cleanup
