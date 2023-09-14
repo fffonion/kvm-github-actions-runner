@@ -186,7 +186,7 @@ while true; do
                 # check health
                 if [[ $(arch) == "x86_64" ]]; then
                     # note a \x0d exist before the number, use grep to strip it
-                    irq=$(virsh qemu-monitor-command ${namevar}-runner --hmp info irq|cut -d: -f2|sort -r|head -n1|grep -oP "\d+")
+                    irq=$(virsh qemu-monitor-command ${namevar}-runner --hmp info irq|cut -d: -f2|sort -nr|head -n1|grep -oP "\d+")
                     if [[ ! -z $irq && $irq -lt 10 ]]; then
                         let watch_dog_check=watch_dog_check+1
                         if [[ $watch_dog_check -gt 180 ]]; then
