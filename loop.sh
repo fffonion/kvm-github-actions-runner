@@ -204,10 +204,10 @@ while true; do
                             echo "IRQ is less than 10 for 10 minutes, recreating VM"
                             echo "Not recreating for testing"
                             send_metrics runners.anomaly "1" "c" "#runner_name:${namevar},#type:vm_force_recreate" 
-                            ## do_cleanup
+                            do_cleanup
                             # reset counter
                             watch_dog_check=0
-                            ## need_respawn=1
+                            need_respawn=1
                         fi
                     else
                         watch_dog_check=0
