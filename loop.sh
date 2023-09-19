@@ -198,7 +198,7 @@ while true; do
                 if [[ $(arch) == "x86_64" ]]; then
                     # note a \x0d exist before the number, use grep to strip it
                     irq=$(virsh qemu-monitor-command ${namevar}-runner --hmp info irq|cut -d: -f2|sort -nr|head -n1|grep -oP "\d+")
-                    if [[ ! -z $irq && $irq -lt 10 ]]; then
+                    if [[ ! -z $irq && $irq -lt 20 ]]; then
                         let watch_dog_check=watch_dog_check+1
                         if [[ $watch_dog_check -gt 120 ]]; then
                             echo "IRQ is less than 10 for 10 minutes, recreating VM"
