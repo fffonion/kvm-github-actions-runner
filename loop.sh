@@ -175,8 +175,6 @@ while true; do
                     exec $0
                 fi
 
-                # check drain flag
-		checkdrain
 
                 # check terraform state
 		if [[ ! -z $(terraform state list) ]]; then
@@ -215,6 +213,9 @@ while true; do
                 fi
 
                 if [[ $need_respawn -eq 1 ]]; then
+		    # check drain flag
+		    checkdrain
+
                     echo "Reprovisioning the VM..."
                     terraform taint libvirt_volume.master || true
                     
