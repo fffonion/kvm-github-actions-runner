@@ -39,5 +39,10 @@ resource "libvirt_network" "kong" {
   addresses = ["10.1.0.0/24", "${var.ipv6_prefix}:1001::/96"]
 
   autostart = true
+
+  xml {
+    # patch to use disallow networking between guests
+    xslt = file("patch-network-isolated.xsl")
+  }
 }
 
