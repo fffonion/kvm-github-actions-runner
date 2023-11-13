@@ -10,13 +10,7 @@ provider "libvirt" {
   uri = "qemu:///system"
 }
 
-# the previous version of the image to keep during migration
-resource "libvirt_volume" "base_volume-20230903-1" {
-  name   = "runner-ubuntu-22.04-20230903.1.qcow2"
-  source = "/root/ubuntu-22.04-20230903.1"
-  format = "qcow2"
-  pool   = libvirt_pool.kong.name
-}
+# TODO: clean up next apply, graceful rollout
 resource "libvirt_volume" "base_volume-20231016-1" {
   name   = "runner-ubuntu-22.04-20231016.1.qcow2"
   source = "/root/ubuntu-22.04-20231016.1"
@@ -24,11 +18,12 @@ resource "libvirt_volume" "base_volume-20231016-1" {
   pool   = libvirt_pool.kong.name
 }
 
-resource "libvirt_volume" "base_volume-20231030-2" {
-  name   = "runner-ubuntu-22.04-${local.image_version}.qcow2"
-  source = "/root/ubuntu-22.04-${local.image_version}"
-  format = "qcow2"
-  pool   = libvirt_pool.kong.name
+resource "libvirt_volume" "base_volumes" {
+  for_each = toset([local.image_version, local.previous_image_version])
+  name     = "runner-ubuntu-22.04-${each.key}.qcow2"
+  source   = "/root/ubuntu-22.04-${each.key}"
+  format   = "qcow2"
+  pool     = libvirt_pool.kong.name
 }
 
 resource "libvirt_pool" "kong" {

@@ -1,6 +1,6 @@
 #!/bin/bash
 total_runners=${1:-13}
-image_version=$(cat $(dirname $0)/../local.tf|grep image_version|cut -d '"' -f2)
+image_version=$(cat $(dirname $0)/../local.tf|grep image_version|grep -v previous|cut -d '"' -f2)
 image_version=${2:-$image_version}
 file_name=/root/ubuntu-22.04-$image_version
 
