@@ -17,19 +17,13 @@ echo "* Image to copy: $file_name"
 echo "* Bootstrap node: $from"
 echo "* Total runners: $total_runners"
 
-for i in $(seq 1 $total_runners); do
-    pending_hosts+=("${prefix}runner-$i")
-done
-
 function do_copy() {
     ssh $dst sudo -E -H rsync -cha rsync://$RUNNER_IMAGE_STORAGE_HOST/build/$(basename $file_name) $file_name
     echo "+ Finished $dst"
 }
 
-offset=0
-let group_count=0
-for i in $(seq 0 $offset); do
-    dst=${pending_hosts[$i]}
+for i in $(seq 1 $total_runners); do
+    dst="${prefix}runner-$i"
     echo "- Copying $dst"
     do_copy $src $dst &
 done
