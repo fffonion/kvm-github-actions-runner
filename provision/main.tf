@@ -10,14 +10,6 @@ provider "libvirt" {
   uri = "qemu:///system"
 }
 
-# TODO: clean up next apply, graceful rollout
-resource "libvirt_volume" "base_volume-20231016-1" {
-  name   = "runner-ubuntu-22.04-20231016.1.qcow2"
-  source = "/root/ubuntu-22.04-20231016.1"
-  format = "qcow2"
-  pool   = libvirt_pool.kong.name
-}
-
 resource "libvirt_volume" "base_volumes" {
   for_each = toset([local.image_version, local.previous_image_version])
   name     = "runner-ubuntu-22.04-${each.key}.qcow2"
