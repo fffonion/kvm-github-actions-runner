@@ -4,7 +4,7 @@
 
 ### Option 1: Download from other machine
 
-TODO: use scp to copy from other existing machines for now
+Use rsync.
 
 ### Option2: Build on current machine
 
@@ -54,7 +54,7 @@ sudo systemctl start self-hosted-kvm@worker-{1,2,3,4,5,6,7,8}
 sudo systemctl enable self-hosted-kvm@worker-{1,2,3,4,5,6,7,8}
 ```
 
-Each VM has 2 vCPU and 4G RAM.
+Each VM has 2 vCPU and 7G RAM.
 
 ## Drain a node
 
@@ -73,7 +73,7 @@ rm /tmp/self-hosted-kvm-draining
 systemd:
 
 ```shell
-# restart all managing process (doesn't restart running VMs)
+# restart all managing process (also restart running VMs)
 sudo systemctl restart self-hosted-kvm@worker-*
 
 # update terraform files (doesn't restart running VMs, affective on next boot)
