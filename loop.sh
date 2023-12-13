@@ -21,6 +21,8 @@ function send_metrics() {
 	echo -n "$metrics" > /dev/udp/$dd_host/8125
 }
 
+source /root/self-hosted-kvm.env && echo "Reloaded env vars" || true
+export
 
 if [[ -n $REG_TOKEN_LAMBDA_URL && -n $REG_TOKEN_LAMBDA_APIKEY ]]; then
 	echo "Using lambda to get reg token"
