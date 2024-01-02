@@ -186,9 +186,11 @@ while true; do
 			# mark as respawn if 1) we change from stopped to running, or 2) first time
 			if [[ $? -ne 0 && (
 					! -z $(echo "$plan" | grep "running" | grep "false") ||
-					! -z $(echo "$plan" | grep "libvirt_domain.test" |grep "will be created")
+					! -z $(echo "$plan" | grep "libvirt_domain.test" |grep "will be created") ||
+					! -z $(echo "$plan" | grep "Error: error while retrieving remote ISO")
 				) ]]; then
-                                need_respawn=1
+
+				need_respawn=1
 			fi
                 else # not created
                     need_respawn=1
