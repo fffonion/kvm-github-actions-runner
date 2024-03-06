@@ -2,6 +2,7 @@ terraform {
   required_providers {
     libvirt = {
       source = "dmacvicar/libvirt"
+      version = ">= 0.7.6"
     }
   }
 }
@@ -28,6 +29,10 @@ resource "libvirt_network" "kong" {
   name   = "kong"
   mode   = "nat"
   domain = "ci.konghq.com.internal"
+
+  dns {
+    enabled = true
+  }
 
   addresses = ["10.1.0.0/24", "${var.ipv6_prefix}:1001::/96"]
 
