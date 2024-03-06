@@ -17,11 +17,11 @@ echo "* Total runners: $total_runners"
 function do_copy() {
     dst=$1
     if [[ $image_arch == "arm64" ]]; then
-        path=arm64/
+        path=arm64
     else
-        path=
+        path=amd64
     fi
-    ssh $dst sudo -E -H rsync -cha rsync://$RUNNER_IMAGE_STORAGE_HOST/build/$path$(basename $file_name) $file_name
+    ssh $dst sudo -E -H rsync -cha rsync://$RUNNER_IMAGE_STORAGE_HOST/build/$path/$(basename $file_name) $file_name
     echo "+ Finished $dst"
 }
 

@@ -43,7 +43,9 @@ rm terraform_${TF_VER}_linux_${ARCH}.zip
 
 sudo rm -rf /var/lib/libvirt/images/*
 
+pushd $REPO_PATH/provision
 $REPO_PATH/provision/apply-changes.sh
+popd
 
 # currently not sure about the right approach to make it work under apparmor
 echo 'security_driver ="none"' |sudo tee -a /etc/libvirt/qemu.conf
