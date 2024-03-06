@@ -13,4 +13,5 @@ logs:
     service: "self_hosted_runner"
     source: "self_hosted_runner"
 EOF
+systemctl enable datadog-agent
 systemctl restart datadog-agent
