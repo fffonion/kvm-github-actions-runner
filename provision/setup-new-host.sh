@@ -59,7 +59,3 @@ sudo systemctl daemon-reload
 sudo mkdir -p /root/vms
 
 
-###### datadog ######
-
-$REPO_PATH/provision/setup-datadog.sh
-
