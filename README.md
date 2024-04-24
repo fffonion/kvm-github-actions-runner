@@ -39,7 +39,6 @@ REPO=<owner/repo; leave empty for org>
 ORG=<owner; leave empty for repo>
 LABELS=ubuntu-22.04-kong,ubuntu-latest-kong
 RUNNERGROUP=awesome group
-RUNNER_VERSION=2.303.0
 DOCKER_USER=<docker user that access to public registry, to increase pull rate limit only>
 DOCKER_PASS=<the password>
 

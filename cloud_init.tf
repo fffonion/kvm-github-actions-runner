@@ -29,7 +29,6 @@ data "cloudinit_config" "main" {
         RUNNERGROUP = var.runnergroup
         DOCKER_USER = var.docker_user
         DOCKER_PASS = var.docker_pass
-        RUNNER_VER  = local.runner_version
       }
     )
   }
