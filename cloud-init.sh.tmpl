@@ -64,9 +64,6 @@ sudo mount -o remount,defaults,nobarrier / /
 echo "Making docker socket less secure"
 sudo chmod 777 /var/run/docker.sock
 
-echo "Temporary fix"
-rm -f /etc/apt/sources.list.d/microsoft-prod.list
-
 if [[ ! -z "${DOCKER_USER}" && ! -z "${DOCKER_PASS}" ]]; then
 	echo "Login docker"
 	echo "${DOCKER_PASS}" | docker login --username ${DOCKER_USER} --password-stdin
