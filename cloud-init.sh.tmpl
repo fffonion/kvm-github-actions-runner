@@ -77,6 +77,9 @@ sudo sed -i 's/security\.ubuntu\.com\/ubuntu/mirror\.hetzner\.com\/ubuntu\/packa
 
 echo "User $USER, UID: $(id)"
 
+# Re-source the env vars to evaluate variables like $HOME
+source /etc/environment
+
 cd # goto my home
 
 mkdir actions-runner && cd actions-runner
