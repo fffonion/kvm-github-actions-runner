@@ -18,11 +18,11 @@ rm packer_${PACKER_VER}_linux_amd64.zip
 sudo apt install git -y
 git clone https://github.com/fffonion/runner-images-kvm -b kvm /root/runner-images-kvm
 cd /root/runner-images-kvm/images/linux
-packer build ./ubuntu2204.pkr.hcl
+packer build ./ubuntu2404.pkr.hcl
 # A docker user with any public repository pull access is preferred to overcome ratelimit.
-# packer build -var dockerhub_login=<user> -var dockerhub_password=<pwd> -var image_version=$(git describe --tags --always|cut -d/ -f2) ./ubuntu2204.pkr.hcl
-mv output-custom_image/ubuntu-22.04 /root/ubuntu-22.04-$(git describe --tags --always|cut -d/ -f2)
-# creates  output-custom_image/ubuntu-22.04
+# packer build -var dockerhub_login=<user> -var dockerhub_password=<pwd> -var image_version=$(git describe --tags --always|cut -d/ -f2) ./ubuntu2404.pkr.hcl
+mv output-custom_image/ubuntu-24.04 /root/ubuntu-24.04-$(git describe --tags --always|cut -d/ -f2)
+# creates  output-custom_image/ubuntu-24.04
 ``` 
 
 ## Provision
@@ -37,7 +37,7 @@ cat << EOF > /root/self-hosted-kvm.env
 GITHUB_TOKEN=<token with repo scope for repo runner, or admin:org for org runner>
 REPO=<owner/repo; leave empty for org>
 ORG=<owner; leave empty for repo>
-LABELS=ubuntu-22.04-kong,ubuntu-latest-kong
+LABELS=ubuntu-24.04-kong,ubuntu-latest-kong
 RUNNERGROUP=awesome group
 DOCKER_USER=<docker user that access to public registry, to increase pull rate limit only>
 DOCKER_PASS=<the password>
