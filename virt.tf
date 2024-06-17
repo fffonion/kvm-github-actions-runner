@@ -1,7 +1,7 @@
 resource "libvirt_volume" "master" {
   name = "${var.name}-master.qcow2"
   #base_volume_id = libvirt_volume.base_volume.id
-  base_volume_name = "runner-ubuntu-24.04-${local.image_version}.qcow2"
+  base_volume_name = "runner-ubuntu-22.04-${local.image_version}.qcow2"
   pool             = "kong"
 }
 
