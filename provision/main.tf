@@ -13,7 +13,7 @@ provider "libvirt" {
 
 # TODO: migration shim
 resource "libvirt_volume" "base_volumes" {
-  for_each = toset([local.previous_image_version])
+  for_each = toset([local.image_version, local.previous_image_version])
   name     = "runner-ubuntu-22.04-${each.key}.qcow2"
   source   = "/root/ubuntu-22.04-${each.key}"
   format   = "qcow2"
@@ -23,7 +23,7 @@ resource "libvirt_volume" "base_volumes" {
 resource "libvirt_volume" "ubuntu_2404_base_volumes" {
   # for_each = toset([local.image_version, local.previous_image_version])
   # TODO: migration shim
-  for_each = toset([local.image_version])
+  for_each = toset(["20240604.1"])
   name     = "runner-ubuntu-24.04-${each.key}.qcow2"
   source   = "/root/ubuntu-24.04-${each.key}"
   format   = "qcow2"
