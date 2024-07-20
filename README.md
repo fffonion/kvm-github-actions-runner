@@ -16,13 +16,12 @@ mv packer /usr/local/bin/packer
 rm packer_${PACKER_VER}_linux_amd64.zip
 
 sudo apt install git -y
-git clone https://github.com/fffonion/runner-images-kvm -b kvm /root/runner-images-kvm
-cd /root/runner-images-kvm/images/linux
-packer build ./ubuntu2404.pkr.hcl
+git clone https://github.com/fffonion/runner-images-kvm
+git checkout main
 # A docker user with any public repository pull access is preferred to overcome ratelimit.
-# packer build -var dockerhub_login=<user> -var dockerhub_password=<pwd> -var image_version=$(git describe --tags --always|cut -d/ -f2) ./ubuntu2404.pkr.hcl
-mv output-custom_image/ubuntu-24.04 /root/ubuntu-24.04-$(git describe --tags --always|cut -d/ -f2)
-# creates  output-custom_image/ubuntu-24.04
+DOCKERHUB_LOGIN=user DOCKERHUB_PASSWORD=pass ./build-new-image.sh    # build ubuntu 22.04
+DOCKERHUB_LOGIN=user DOCKERHUB_PASSWORD=pass ./build-new-image.sh 24 # build ubuntu 24.04
+# The output is saved under "output-custom_image/ubuntu-*.04"
 ``` 
 
 ## Provision
