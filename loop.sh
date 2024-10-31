@@ -38,12 +38,7 @@ if [[ -z $NAME ]]; then
 	exit 1
 fi
 
-urlvar=""
-if [[ ! -z $REPO ]]; then
-	urlvar=https://github.com/$REPO
-else
-	urlvar=https://github.com/$ORG
-fi
+urlvar="https://github.com/$OWNER"
 namevar="$(hostname)-$NAME"
 
 
@@ -56,8 +51,19 @@ if [[ -e $workdir/terraform.tfstate ]]; then
 fi
 
 reload_file=/tmp/self-hosted-kvm@${namevar}.reload
+tfvarfile="/root/vms/self-hosted-kvm-tf-$NAME.tfvars"
 
-tf_args="-var url=$urlvar -var docker_user=$DOCKER_USER -var docker_pass=$DOCKER_PASS -var name=$namevar -var labels=$LABELS -var runnergroup=$RUNNERGROUP"
+cat > $tfvarfile <<EOF
+url="$urlvar"
+docker_user="$DOCKER_USER"
+docker_pass="$DOCKER_PASS"
+name="$namevar"
+labels="$LABELS"
+runnergroup="$RUNNERGROUP"
+
+EOF
+
+tf_args="-var-file $tfvarfile"
 
 if [[ $(arch) == "aarch64" ]]; then
 	tf_args="$tf_args -var arm64=true"
@@ -114,13 +120,12 @@ fi
 
 checkdrain
 
-if [[ ! -z $ORG ]]; then
-	url=https://api.github.com/orgs/${ORG}/actions/runners/registration-token
-elif [[ ! -z $REPO ]]; then
-	url=https://api.github.com/repos/${REPO}/actions/runners/registration-token
+if [[ $OWNER == "enterprises/"* ]]; then
+	url=https://api.github.com/${OWNER}/actions/runners/registration-token
+elif [[ $OWNER == *"/"* ]]; then
+	url=https://api.github.com/repos/${OWNER}/actions/runners/registration-token
 else
-	echoerr 'Neither $ORG nor $REPO is defined'
-	exit 1
+	url=https://api.github.com/orgs/${OWNER}/actions/runners/registration-token
 fi
 
 # remove the -e flag, in case we hit a bug, we don't want to just kill the vm
