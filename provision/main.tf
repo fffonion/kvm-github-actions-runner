@@ -21,7 +21,8 @@ resource "libvirt_volume" "base_volumes" {
 }
 
 resource "libvirt_volume" "ubuntu_2404_base_volumes" {
-  for_each = toset([local.image_version, local.previous_image_version])
+#  for_each = toset([local.image_version, local.previous_image_version])
+  for_each = toset([local.image_version])
   name     = "runner-ubuntu-24.04-${each.key}.qcow2"
   source   = "/root/ubuntu-24.04-${each.key}"
   format   = "qcow2"
