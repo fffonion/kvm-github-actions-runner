@@ -54,6 +54,7 @@ sudo systemctl restart libvirtd
 
 ###### systemd ######
 sudo cp $REPO_PATH/self-hosted-kvm@.service /etc/systemd/system/self-hosted-kvm@.service
+sudo cp $REPO_PATH/libvirtd_monitor.service /etc/systemd/system/libvirtd_monitor.service
 sudo systemctl daemon-reload
 
 sudo mkdir -p /root/vms

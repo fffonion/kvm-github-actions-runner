@@ -1,0 +1,16 @@
+[Unit]
+Description=LibvirtD Monitoring Service
+After=network.target libvirtd.service
+Wants=libvirtd.service
+
+[Service]
+Type=simple
+ExecStart=/root/self-hosted-kvm/monitor-libvirtd.sh
+Restart=always
+RestartSec=10
+User=root
+StandardOutput=append:/var/log/libvirtd-monitor.log
+StandardError=append:/var/log/libvirtd-monitor.log
+
+[Install]
+WantedBy=multi-user.target
