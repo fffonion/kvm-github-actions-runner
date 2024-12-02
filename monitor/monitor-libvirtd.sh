@@ -5,10 +5,8 @@ CHECK_INTERVAL=60  # Check every 60 seconds
 MAX_FAILURES=15    # 15 checks = 15 minutes
 TIMEOUT=10         # Command timeout in seconds
 FAILURE_COUNT=0
-LOG_FILE="/var/log/libvirtd-monitor.log"
 
 log_message() {
-    echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" >> "$LOG_FILE"
     echo "$(date '+%Y-%m-%d %H:%M:%S') - $1"
 }
 
