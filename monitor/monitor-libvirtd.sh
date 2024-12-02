@@ -29,7 +29,7 @@ restart_libvirtd() {
     log_message "Attempting to restart libvirtd service"
     send_metrics runners.anomaly "1" "c" "#type:libvirtd_restarted"
 
-    systemctl restart libvirtd
+    # systemctl restart libvirtd
 
     # Wait for service to initialize
     sleep 5
@@ -46,7 +46,7 @@ restart_libvirtd() {
 
 # Main monitoring loop
 while true; do
-    if check_libvirtd; then
+    if ! check_libvirtd; then
         FAILURE_COUNT=$((FAILURE_COUNT + 1))
         log_message "libvirtd check failed ($FAILURE_COUNT/$MAX_FAILURES)"
 

@@ -5,7 +5,7 @@ Wants=libvirtd.service
 
 [Service]
 Type=simple
-ExecStart=/root/self-hosted-kvm/monitor-libvirtd.sh
+ExecStart=/root/self-hosted-kvm/monitor/monitor-libvirtd.sh
 Restart=always
 RestartSec=10
 User=root
