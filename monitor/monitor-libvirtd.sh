@@ -32,7 +32,7 @@ restart_libvirtd() {
     log_message "Attempting to restart libvirtd service"
     send_metrics runners.anomaly "1" "c" "#type:libvirtd_restarted"
 
-    # systemctl restart libvirtd
+    systemctl restart libvirtd
 
     # Wait for service to initialize
     sleep 5
