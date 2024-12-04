@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 # Configuration
 CHECK_INTERVAL=60  # Check every 60 seconds
@@ -16,12 +16,17 @@ check_libvirtd() {
     return $?
 }
 
+dd_host="10.1.0.1"
+
 function send_metrics() {
 	metrics="github.actions.$1:${2:-1}|${3:-c}|#runner_group:${RUNNERGROUP}"
 	if [[ ! -z "$4" ]]; then metrics="$metrics,$4"; fi
 	echo "Send metrics $metrics to $dd_host"
 	echo -n "$metrics" > /dev/udp/$dd_host/8125
 }
+
+source /root/self-hosted-kvm.env && echo "Reloaded env vars" || true
+export
 
 restart_libvirtd() {
     log_message "Attempting to restart libvirtd service"
